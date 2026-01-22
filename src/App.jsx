@@ -6,6 +6,9 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SolicitarViaje } from './pages/SolicitarViaje';
 import { MisViajes } from './pages/MisViajes';
+import { ViajeDetalle } from './pages/ViajeDetalle';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 
 function App() {
   return (
@@ -13,6 +16,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           
           <Route
             path="/"
