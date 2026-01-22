@@ -1,17 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, Package, Truck, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Package, Truck, DollarSign, Clock, CheckCircle, Radio } from 'lucide-react';
 import tripService from '../services/trip.service';
+import { ProposePrice } from '../components/ProposePrice';
+import { TripMap } from '../components/TripMap';
+import { CheckInTimeline } from '../components/CheckInTimeline';
+import { useWebSocket } from '../hooks/useWebSocket';
 
 export const ViajeDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showProposeModal, setShowProposeModal] = useState(false);
+  const { isConnected, lastUpdate } = useWebSocket(id);
 
   useEffect(() => {
     loadTrip();
   }, [id]);
+
+  // Actualizar viaje cuando llega una actualización por WebSocket
+  useEffect(() => {
+    if (lastUpdate) {
+      loadTrip();
+    }
+  }, [lastUpdate]);
 
   const loadTrip = async () => {
     try {
@@ -24,7 +37,23 @@ export const ViajeDetalle = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
+  const handleProposePrice = async (price) => {
+    await tripService.proposePrice(id, price);
+    await loadTrip();
+  };
+
+  const getSubStatusLabel = (subStatus) => {
+    const subStatusLabels = {
+      'llegue_a_cargar': '🚚 Llegué a cargar',
+      'cargado_saliendo': '📦 Cargado, saliendo',
+      'en_camino': '🛣️ En camino',
+      'llegue_a_destino': '📍 Llegué a destino',
+      'descargado': '✅ Descargado'
+    };
+    return subStatusLabels[subStatus] || null;
+  };
+
+  const getStatusBadge = (status, subStatus) => {
     const statusConfig = {
       solicitado: { color: 'bg-blue-100 text-blue-800', label: 'Solicitado' },
       cotizando: { color: 'bg-yellow-100 text-yellow-800', label: 'Cotizando' },
@@ -35,11 +64,19 @@ export const ViajeDetalle = () => {
     };
 
     const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', label: status };
+    const subLabel = getSubStatusLabel(subStatus);
     
     return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
-        {config.label}
-      </span>
+      <div className="flex items-center gap-2">
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
+          {config.label}
+        </span>
+        {subLabel && (
+          <span className="text-sm text-gray-600">
+            {subLabel}
+          </span>
+        )}
+      </div>
     );
   };
 
@@ -82,7 +119,7 @@ export const ViajeDetalle = () => {
             <h1 className="text-3xl font-bold text-gray-900">{trip.numeroViaje}</h1>
             <p className="text-gray-600 mt-1">Detalles del viaje</p>
           </div>
-          {getStatusBadge(trip.estado)}
+          {getStatusBadge(trip.estado, trip.subEstado)}
         </div>
       </div>
 
@@ -162,6 +199,26 @@ export const ViajeDetalle = () => {
             </div>
           </div>
 
+          {/* Mapa de Tracking */}
+          {(trip.estado === 'en_curso' || trip.trackingActivo || trip.rutaCompleta?.length > 0) && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Tracking en Tiempo Real</h2>
+                {isConnected && (
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <Radio className="w-4 h-4 animate-pulse" />
+                    <span>En vivo</span>
+                  </div>
+                )}
+              </div>
+              <TripMap 
+                trip={trip}
+                currentLocation={trip.rutaCompleta?.[trip.rutaCompleta.length - 1]}
+                route={trip.rutaCompleta || []}
+              />
+            </div>
+          )}
+
           {/* Notas */}
           {trip.notas && (
             <div className="bg-white rounded-lg shadow p-6">
@@ -170,28 +227,8 @@ export const ViajeDetalle = () => {
             </div>
           )}
 
-          {/* Check-ins */}
-          {trip.checkIns && trip.checkIns.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Check-ins</h2>
-              <div className="space-y-3">
-                {trip.checkIns.map((checkIn, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{checkIn.tipo}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(checkIn.fechaHora).toLocaleString('es-AR')}
-                      </p>
-                      {checkIn.notas && (
-                        <p className="text-sm text-gray-600 mt-1">{checkIn.notas}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Check-ins Timeline */}
+          <CheckInTimeline checkIns={trip.checkIns} />
         </div>
 
         {/* Sidebar */}
@@ -219,37 +256,45 @@ export const ViajeDetalle = () => {
           )}
 
           {/* Precios */}
-          {trip.precios && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Precios</h2>
-              <div className="space-y-3">
-                {trip.precios.precioBase && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Precio Base</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      ${trip.precios.precioBase.toLocaleString('es-AR')}
-                    </span>
-                  </div>
-                )}
-                {trip.precios.precioPropuesto && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Precio Propuesto</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      ${trip.precios.precioPropuesto.toLocaleString('es-AR')}
-                    </span>
-                  </div>
-                )}
-                {trip.precios.precioConfirmado && (
-                  <div className="flex items-center justify-between pt-3 border-t">
-                    <span className="text-sm font-semibold text-gray-900">Precio Confirmado</span>
-                    <span className="text-lg font-bold text-primary-600">
-                      ${trip.precios.precioConfirmado.toLocaleString('es-AR')}
-                    </span>
-                  </div>
-                )}
-              </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Precios</h2>
+            <div className="space-y-3">
+              {trip.precios?.precioBase && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Precio Base</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    ${trip.precios.precioBase.toLocaleString('es-AR')}
+                  </span>
+                </div>
+              )}
+              {trip.precios?.precioPropuesto && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Tu Propuesta</span>
+                  <span className="text-sm font-medium text-blue-600">
+                    ${trip.precios.precioPropuesto.toLocaleString('es-AR')}
+                  </span>
+                </div>
+              )}
+              {trip.precios?.precioConfirmado && (
+                <div className="flex items-center justify-between pt-3 border-t">
+                  <span className="text-sm font-semibold text-gray-900">Precio Confirmado</span>
+                  <span className="text-lg font-bold text-primary-600">
+                    ${trip.precios.precioConfirmado.toLocaleString('es-AR')}
+                  </span>
+                </div>
+              )}
             </div>
-          )}
+
+            {!trip.precios?.precioConfirmado && ['solicitado', 'cotizando'].includes(trip.estado) && (
+              <button
+                onClick={() => setShowProposeModal(true)}
+                className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <DollarSign className="w-4 h-4" />
+                {trip.precios?.precioPropuesto ? 'Modificar Propuesta' : 'Proponer Precio'}
+              </button>
+            )}
+          </div>
 
           {/* Timeline */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -279,6 +324,14 @@ export const ViajeDetalle = () => {
           </div>
         </div>
       </div>
+
+      {showProposeModal && (
+        <ProposePrice
+          trip={trip}
+          onPropose={handleProposePrice}
+          onClose={() => setShowProposeModal(false)}
+        />
+      )}
     </div>
   );
 };

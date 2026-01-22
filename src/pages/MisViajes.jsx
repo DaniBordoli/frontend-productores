@@ -48,7 +48,18 @@ export const MisViajes = () => {
     setFilteredTrips(filtered);
   };
 
-  const getStatusBadge = (status) => {
+  const getSubStatusLabel = (subStatus) => {
+    const subStatusLabels = {
+      'llegue_a_cargar': '🚚 Llegué a cargar',
+      'cargado_saliendo': '📦 Cargado, saliendo',
+      'en_camino': '🛣️ En camino',
+      'llegue_a_destino': '📍 Llegué a destino',
+      'descargado': '✅ Descargado'
+    };
+    return subStatusLabels[subStatus] || null;
+  };
+
+  const getStatusBadge = (status, subStatus) => {
     const statusConfig = {
       solicitado: { color: 'bg-blue-100 text-blue-800', label: 'Solicitado' },
       cotizando: { color: 'bg-yellow-100 text-yellow-800', label: 'Cotizando' },
@@ -59,11 +70,19 @@ export const MisViajes = () => {
     };
 
     const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', label: status };
+    const subLabel = getSubStatusLabel(subStatus);
     
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
-        {config.label}
-      </span>
+      <div className="flex flex-col gap-1">
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+          {config.label}
+        </span>
+        {subLabel && (
+          <span className="text-xs text-gray-600">
+            {subLabel}
+          </span>
+        )}
+      </div>
     );
   };
 
@@ -104,19 +123,19 @@ export const MisViajes = () => {
             </button>
             <button
               onClick={() => setStatusFilter('solicitado')}
-              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'solicitado' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'solicitado' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               Solicitado
             </button>
             <button
               onClick={() => setStatusFilter('en_curso')}
-              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'en_curso' ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'en_curso' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               En Curso
             </button>
             <button
               onClick={() => setStatusFilter('finalizado')}
-              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'finalizado' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'finalizado' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               Finalizado
             </button>
@@ -139,7 +158,7 @@ export const MisViajes = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">{trip.numeroViaje}</h3>
-                      {getStatusBadge(trip.estado)}
+                      {getStatusBadge(trip.estado, trip.subEstado)}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
@@ -185,7 +204,9 @@ export const MisViajes = () => {
                     {trip.transportista && (
                       <div className="mt-3 flex items-center gap-2 text-sm">
                         <Truck className="w-4 h-4 text-primary-600" />
-                        <span className="text-gray-600">Transportista asignado</span>
+                        <span className="text-gray-600">
+                          Transportista: <span className="font-medium text-gray-900">{trip.transportista.nombreConductor}</span>
+                        </span>
                       </div>
                     )}
                   </div>

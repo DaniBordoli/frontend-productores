@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Truck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -102,14 +102,19 @@ export const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p>¿Necesitas ayuda? Contacta a tu operador</p>
+          <div className="mt-6 text-center">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-600 hover:text-blue-700"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
         </div>
       </div>
