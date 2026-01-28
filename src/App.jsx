@@ -9,6 +9,7 @@ import { MisViajes } from './pages/MisViajes';
 import { ViajeDetalle } from './pages/ViajeDetalle';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
+import { SetPassword } from './pages/SetPassword';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/set-password/:token" element={<SetPassword />} />
           
           <Route
             path="/"
