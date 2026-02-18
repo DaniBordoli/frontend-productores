@@ -51,11 +51,12 @@ export const ProposePrice = ({ trip, onPropose, onClose }) => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="propose-price" className="block text-sm font-medium text-gray-700 mb-2">
               <DollarSign className="w-4 h-4 inline mr-1" />
               Tu Propuesta *
             </label>
             <input
+              id="propose-price"
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}

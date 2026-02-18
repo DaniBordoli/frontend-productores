@@ -38,7 +38,9 @@ function MapBounds({ bounds }) {
   return null;
 }
 
-export const TripMap = ({ trip, currentLocation, route = [] }) => {
+const EMPTY_ROUTE = [];
+
+export const TripMap = ({ trip, currentLocation, route = EMPTY_ROUTE }) => {
   const mapRef = useRef();
 
   // Coordenadas de origen y destino

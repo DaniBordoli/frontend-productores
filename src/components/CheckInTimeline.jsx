@@ -24,7 +24,9 @@ const checkInColors = {
   descargado: 'bg-green-100 text-green-600',
 };
 
-export const CheckInTimeline = ({ checkIns = [] }) => {
+const EMPTY_CHECK_INS = [];
+
+export const CheckInTimeline = ({ checkIns = EMPTY_CHECK_INS }) => {
   if (!checkIns || checkIns.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">

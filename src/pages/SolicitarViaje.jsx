@@ -99,10 +99,11 @@ export const SolicitarViaje = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="origen-direccion" className="block text-sm font-medium text-gray-700 mb-1">
                   Dirección *
                 </label>
                 <input
+                  id="origen-direccion"
                   type="text"
                   name="origen.direccion"
                   value={formData.origen.direccion}
@@ -113,10 +114,11 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="origen-ciudad" className="block text-sm font-medium text-gray-700 mb-1">
                   Ciudad *
                 </label>
                 <input
+                  id="origen-ciudad"
                   type="text"
                   name="origen.ciudad"
                   value={formData.origen.ciudad}
@@ -127,10 +129,11 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="origen-provincia" className="block text-sm font-medium text-gray-700 mb-1">
                   Provincia *
                 </label>
                 <input
+                  id="origen-provincia"
                   type="text"
                   name="origen.provincia"
                   value={formData.origen.provincia}
@@ -151,10 +154,11 @@ export const SolicitarViaje = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="destino-direccion" className="block text-sm font-medium text-gray-700 mb-1">
                   Dirección *
                 </label>
                 <input
+                  id="destino-direccion"
                   type="text"
                   name="destino.direccion"
                   value={formData.destino.direccion}
@@ -165,10 +169,11 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="destino-ciudad" className="block text-sm font-medium text-gray-700 mb-1">
                   Ciudad *
                 </label>
                 <input
+                  id="destino-ciudad"
                   type="text"
                   name="destino.ciudad"
                   value={formData.destino.ciudad}
@@ -179,10 +184,11 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="destino-provincia" className="block text-sm font-medium text-gray-700 mb-1">
                   Provincia *
                 </label>
                 <input
+                  id="destino-provincia"
                   type="text"
                   name="destino.provincia"
                   value={formData.destino.provincia}
@@ -194,10 +200,11 @@ export const SolicitarViaje = () => {
               </div>
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="tipo-destino" className="block text-sm font-medium text-gray-700 mb-1">
                 Tipo de Destino *
               </label>
               <select
+                id="tipo-destino"
                 name="tipoDestino"
                 value={formData.tipoDestino}
                 onChange={handleChange}
@@ -218,11 +225,12 @@ export const SolicitarViaje = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="fecha-programada" className="block text-sm font-medium text-gray-700 mb-1">
                   <Calendar className="w-4 h-4 inline mr-1" />
                   Fecha Programada *
                 </label>
                 <input
+                  id="fecha-programada"
                   type="datetime-local"
                   name="fechaProgramada"
                   value={formData.fechaProgramada}
@@ -232,10 +240,11 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="tipo-carga" className="block text-sm font-medium text-gray-700 mb-1">
                   Tipo de Carga
                 </label>
                 <input
+                  id="tipo-carga"
                   type="text"
                   name="tipoCarga"
                   value={formData.tipoCarga}
@@ -245,10 +254,11 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="peso" className="block text-sm font-medium text-gray-700 mb-1">
                   Peso (toneladas) *
                 </label>
                 <input
+                  id="peso"
                   type="number"
                   name="peso"
                   value={formData.peso}
@@ -261,11 +271,12 @@ export const SolicitarViaje = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="camiones-solicitados" className="block text-sm font-medium text-gray-700 mb-1">
                   <Truck className="w-4 h-4 inline mr-1" />
                   Camiones Solicitados *
                 </label>
                 <input
+                  id="camiones-solicitados"
                   type="number"
                   name="camionesSolicitados"
                   value={formData.camionesSolicitados}
@@ -281,10 +292,11 @@ export const SolicitarViaje = () => {
 
           {/* Notas */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="notas" className="block text-sm font-medium text-gray-700 mb-1">
               Notas Adicionales
             </label>
             <textarea
+              id="notas"
               name="notas"
               value={formData.notas}
               onChange={handleChange}

@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Calendar, Package, Truck, Eye } from 'lucide-react';
 import tripService from '../services/trip.service';
 
 export const MisViajes = () => {
   const [trips, setTrips] = useState([]);
-  const [filteredTrips, setFilteredTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -13,10 +12,6 @@ export const MisViajes = () => {
   useEffect(() => {
     loadTrips();
   }, []);
-
-  useEffect(() => {
-    filterTrips();
-  }, [searchTerm, statusFilter, trips]);
 
   const loadTrips = async () => {
     try {
@@ -29,7 +24,7 @@ export const MisViajes = () => {
     }
   };
 
-  const filterTrips = () => {
+  const filteredTrips = useMemo(() => {
     let filtered = trips;
 
     if (searchTerm) {
@@ -45,8 +40,8 @@ export const MisViajes = () => {
       filtered = filtered.filter(t => t.estado === statusFilter);
     }
 
-    setFilteredTrips(filtered);
-  };
+    return filtered;
+  }, [trips, searchTerm, statusFilter]);
 
   const getSubStatusLabel = (subStatus) => {
     const subStatusLabels = {

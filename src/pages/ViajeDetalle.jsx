@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MapPin, Calendar, Package, Truck, DollarSign, Clock, CheckCircle, Radio } from 'lucide-react';
 import tripService from '../services/trip.service';
@@ -15,18 +15,7 @@ export const ViajeDetalle = () => {
   const [showProposeModal, setShowProposeModal] = useState(false);
   const { isConnected, lastUpdate } = useWebSocket(id);
 
-  useEffect(() => {
-    loadTrip();
-  }, [id]);
-
-  // Actualizar viaje cuando llega una actualización por WebSocket
-  useEffect(() => {
-    if (lastUpdate) {
-      loadTrip();
-    }
-  }, [lastUpdate]);
-
-  const loadTrip = async () => {
+  const loadTrip = useCallback(async () => {
     try {
       const data = await tripService.getById(id);
       setTrip(data);
@@ -35,7 +24,19 @@ export const ViajeDetalle = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadTrip();
+  }, [loadTrip]);
+
+  // Actualizar viaje cuando llega una actualización por WebSocket
+  // eslint-disable-next-line react-doctor/no-effect-event-handler
+  useEffect(() => {
+    if (lastUpdate) {
+      loadTrip();
+    }
+  }, [lastUpdate, loadTrip]);
 
   const handleProposePrice = async (price) => {
     await tripService.proposePrice(id, price);

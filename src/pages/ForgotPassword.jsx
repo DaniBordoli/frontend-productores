@@ -1,28 +1,31 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, Truck } from 'lucide-react';
 import api from '../services/api';
 
+const initialState = { email: '', loading: false, error: '', success: false, resetToken: '' };
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_EMAIL': return { ...state, email: action.payload };
+    case 'SUBMIT': return { ...state, loading: true, error: '' };
+    case 'SUCCESS': return { ...state, loading: false, success: true, resetToken: action.payload };
+    case 'ERROR': return { ...state, loading: false, error: action.payload };
+    default: return state;
+  }
+}
+
 export const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [resetToken, setResetToken] = useState('');
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { email, loading, error, success, resetToken } = state;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
+    dispatch({ type: 'SUBMIT' });
     try {
       const response = await api.post('/auth/forgot-password', { email });
-      setSuccess(true);
-      setResetToken(response.data.resetToken);
+      dispatch({ type: 'SUCCESS', payload: response.data.resetToken });
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al solicitar recuperación');
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'ERROR', payload: err.response?.data?.message || 'Error al solicitar recuperación' });
     }
   };
 
@@ -87,13 +90,14 @@ export const ForgotPassword = () => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="forgot-email" className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
             <input
+              id="forgot-email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => dispatch({ type: 'SET_EMAIL', payload: e.target.value })}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="tu@email.com"

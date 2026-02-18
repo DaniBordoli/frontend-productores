@@ -1,48 +1,50 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Truck, ArrowLeft } from 'lucide-react';
 import api from '../services/api';
 
+const initialState = { showPassword: false, showConfirmPassword: false, newPassword: '', confirmPassword: '', loading: false, error: '', success: false };
+function reducer(state, action) {
+  switch (action.type) {
+    case 'TOGGLE_SHOW_PASSWORD': return { ...state, showPassword: !state.showPassword };
+    case 'TOGGLE_SHOW_CONFIRM': return { ...state, showConfirmPassword: !state.showConfirmPassword };
+    case 'SET_FIELD': return { ...state, [action.field]: action.payload };
+    case 'SUBMIT': return { ...state, loading: true, error: '' };
+    case 'SUCCESS': return { ...state, loading: false, success: true };
+    case 'ERROR': return { ...state, loading: false, error: action.payload };
+    default: return state;
+  }
+}
+
 export const ResetPassword = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { showPassword, showConfirmPassword, newPassword, confirmPassword, loading, error, success } = state;
+  const formData = { newPassword, confirmPassword };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      dispatch({ type: 'ERROR', payload: 'Las contraseñas no coinciden' });
       return;
     }
 
     if (formData.newPassword.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      dispatch({ type: 'ERROR', payload: 'La contraseña debe tener al menos 6 caracteres' });
       return;
     }
 
-    setLoading(true);
-
+    dispatch({ type: 'SUBMIT' });
     try {
       await api.post('/auth/reset-password', {
         token,
         newPassword: formData.newPassword
       });
-      setSuccess(true);
+      dispatch({ type: 'SUCCESS' });
       setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al resetear contraseña');
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'ERROR', payload: err.response?.data?.message || 'Error al restablecer la contraseña' });
     }
   };
 
@@ -91,14 +93,15 @@ export const ResetPassword = () => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="reset-new-password" className="block text-sm font-medium text-gray-700 mb-2">
               Nueva Contraseña
             </label>
             <div className="relative">
               <input
+                id="reset-new-password"
                 type={showPassword ? 'text' : 'password'}
                 value={formData.newPassword}
-                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'newPassword', payload: e.target.value })}
                 required
                 minLength={6}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -106,7 +109,7 @@ export const ResetPassword = () => {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_SHOW_PASSWORD' })}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -115,14 +118,15 @@ export const ResetPassword = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="reset-confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
               Confirmar Contraseña
             </label>
             <div className="relative">
               <input
+                id="reset-confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'confirmPassword', payload: e.target.value })}
                 required
                 minLength={6}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -130,7 +134,7 @@ export const ResetPassword = () => {
               />
               <button
                 type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_SHOW_CONFIRM' })}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}

@@ -1,28 +1,36 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+const initialState = { password: '', confirmPassword: '', showPassword: false, showConfirmPassword: false, loading: false, error: '', success: false };
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD': return { ...state, [action.field]: action.payload };
+    case 'TOGGLE_SHOW_PASSWORD': return { ...state, showPassword: !state.showPassword };
+    case 'TOGGLE_SHOW_CONFIRM': return { ...state, showConfirmPassword: !state.showConfirmPassword };
+    case 'SUBMIT': return { ...state, loading: true, error: '' };
+    case 'SUCCESS': return { ...state, loading: false, success: true };
+    case 'ERROR': return { ...state, loading: false, error: action.payload };
+    default: return state;
+  }
+}
+
 export function SetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { password, confirmPassword, showPassword, showConfirmPassword, loading, error, success } = state;
 
   const validatePassword = () => {
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      dispatch({ type: 'ERROR', payload: 'La contraseña debe tener al menos 6 caracteres' });
       return false;
     }
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      dispatch({ type: 'ERROR', payload: 'Las contraseñas no coinciden' });
       return false;
     }
     return true;
@@ -30,34 +38,20 @@ export function SetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (!validatePassword()) return;
 
-    if (!validatePassword()) {
-      return;
-    }
-
-    setLoading(true);
-
+    dispatch({ type: 'SUBMIT' });
     try {
       const response = await axios.post(`${API_URL}/auth/set-password`, {
         token,
         password
       });
-
-      // Guardar token JWT en localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-
-      setSuccess(true);
-
-      // Redirigir al dashboard después de 2 segundos
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      dispatch({ type: 'SUCCESS' });
+      setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al configurar la contraseña');
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'ERROR', payload: err.response?.data?.message || 'Error al configurar la contraseña' });
     }
   };
 
@@ -110,7 +104,7 @@ export function SetPassword() {
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'password', payload: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
                 placeholder="Mínimo 6 caracteres"
                 required
@@ -118,7 +112,7 @@ export function SetPassword() {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_SHOW_PASSWORD' })}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -138,7 +132,7 @@ export function SetPassword() {
                 type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'confirmPassword', payload: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
                 placeholder="Repite tu contraseña"
                 required
@@ -146,7 +140,7 @@ export function SetPassword() {
               />
               <button
                 type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                onClick={() => dispatch({ type: 'TOGGLE_SHOW_CONFIRM' })}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}

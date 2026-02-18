@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 
 export const useWebSocket = (tripId) => {
   const socketRef = useRef(null);
+  const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
 
@@ -16,6 +17,7 @@ export const useWebSocket = (tripId) => {
     socketRef.current = io(wsUrl, {
       transports: ['websocket', 'polling'],
     });
+    setSocket(socketRef.current);
 
     socketRef.current.on('connect', () => {
       console.log('✅ WebSocket conectado');
@@ -65,6 +67,7 @@ export const useWebSocket = (tripId) => {
       if (socketRef.current) {
         socketRef.current.emit('leave-trip', tripId);
         socketRef.current.disconnect();
+        setSocket(null);
       }
     };
   }, [tripId]);
@@ -72,6 +75,6 @@ export const useWebSocket = (tripId) => {
   return {
     isConnected,
     lastUpdate,
-    socket: socketRef.current,
+    socket,
   };
 };
