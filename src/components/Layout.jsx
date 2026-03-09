@@ -11,6 +11,7 @@ import rutaycampoLogo from '../assets/rutaycampoLogo.svg';
 const menuItems = [
   { path: '/', icon: 'dashboard', label: 'Dashboard' },
   { path: '/viajes', icon: 'viajes', label: 'Viajes' },
+  { path: '/perfil', icon: 'perfil', label: 'Mi Perfil' },
 ];
 
 export const Layout = ({ children }) => {
@@ -33,6 +34,13 @@ export const Layout = ({ children }) => {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fillRule="evenodd" clipRule="evenodd" d="M13 9C10.7909 9 9 10.7909 9 13V18C9 20.2091 10.7909 22 13 22H18C20.2091 22 22 20.2091 22 18V13C22 10.7909 20.2091 9 18 9H13Z" fill={color} />
             <path fillRule="evenodd" clipRule="evenodd" d="M6 2C3.79086 2 2 3.79086 2 6V11C2 13.3689 3.7613 15 6 15C6.55228 15 7 14.5523 7 14V13C7 9.68629 9.68629 7 13 7H14C14.5523 7 15 6.55228 15 6C15 3.7613 13.3689 2 11 2H6Z" fill={color} />
+          </svg>
+        );
+      case 'perfil':
+        return (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" clipRule="evenodd" d="M12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4ZM6 8C6 4.68629 8.68629 2 12 2C15.3137 2 18 4.68629 18 8C18 11.3137 15.3137 14 12 14C8.68629 14 6 11.3137 6 8Z" fill={color} />
+            <path fillRule="evenodd" clipRule="evenodd" d="M4 20C4 17.2386 6.23858 15 9 15H15C17.7614 15 20 17.2386 20 20V22H18V20C18 18.3431 16.6569 17 15 17H9C7.34315 17 6 18.3431 6 20V22H4V20Z" fill={color} />
           </svg>
         );
       case 'viajes':

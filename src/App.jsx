@@ -10,6 +10,7 @@ import { ViajeDetalle } from './pages/ViajeDetalle';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { SetPassword } from './pages/SetPassword';
+import { MiPerfil } from './pages/MiPerfil';
 
 function App() {
   return (
@@ -65,6 +66,17 @@ function App() {
             }
           />
           
+          <Route
+            path="/perfil"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <MiPerfil />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
