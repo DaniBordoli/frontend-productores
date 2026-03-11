@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import tripService from '../services/trip.service';
 import { StatusBadge } from '../components/StatusBadge';
 import { TripMap } from '../components/TripMap';
 import { CheckInTimeline } from '../components/CheckInTimeline';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { Button, LoadingSpinner, Breadcrumb } from '../components/ui';
+import { Button, LoadingSpinner, Breadcrumb, DataTable } from '../components/ui';
+import { TripSummaryCard } from '../components/TripSummaryCard';
+import { TruckDetailSheet } from '../components/TruckDetailSheet';
+import { TripDetailModal } from '../components/TripDetailModal';
+import arrowRightSvg from '../assets/arrow-right.svg';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '—';
@@ -71,7 +75,10 @@ export const ViajeDetalle = () => {
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showTracking, setShowTracking] = useState(false);
+  const [selectedTruckIdx, setSelectedTruckIdx] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { isConnected, lastUpdate } = useWebSocket(id);
+  const trucksRef = useRef(null);
 
   const loadTrip = useCallback(async () => {
     try {
@@ -107,7 +114,14 @@ export const ViajeDetalle = () => {
   const destCity = cityOf(trip.destino);
   const distanceKm = trip.distancia ? `${trip.distancia} km` : null;
   const requestedTrucks = trip.camionesSolicitados ?? 0;
-  const assignedTrucks = trip.camiones || [];
+  const assignedTrucks = [
+    { _id: '1', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
+    { _id: '2', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
+    { _id: '3', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
+    { _id: '4', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
+    { _id: '5', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
+    { _id: '6', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
+  ]; // TODO: remove mock
   const canTrack = trip.estado === 'en_curso' && (trip.trackingActivo || trip.rutaCompleta?.length > 0);
 
   // Pricing
@@ -118,27 +132,60 @@ export const ViajeDetalle = () => {
   const priceLabel = finalPrice ? 'Final' : confirmedPrice ? 'Confirmada' : 'Propuesta';
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb + date */}
-      <div className="flex items-center justify-between">
-        <Breadcrumb parentLabel="Mis Viajes" parentPath="/viajes" currentLabel="Detalle del viaje" />
-        <span className="text-sm text-gray-400">{formatDate(trip.fechaProgramada)}</span>
-      </div>
+    <div className="flex flex-col gap-6">
 
-      {/* Title + actions */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
+      {/* ── Mobile layout ────────────────────────── md:hidden */}
+      <div className="md:hidden flex flex-col gap-4">
+        <Breadcrumb parentLabel="Mis Viajes" parentPath="/viajes" currentLabel="Detalle del viaje" />
+        <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-3xl font-bold text-gray-900">
             Viaje {trip.numeroViaje ? `#${trip.numeroViaje}` : ''}
           </h1>
           <StatusBadge status={trip.estado} />
         </div>
-        {canTrack && (
-          <Button onClick={() => setShowTracking((v) => !v)}>
-            {showTracking ? 'Ocultar mapa' : 'Ver tracking'}
-          </Button>
+        {trip.estado === 'solicitado' && (
+          <div
+            className="rounded-2xl px-4 py-4"
+            style={{ background: 'rgba(108, 178, 255, 0.15)' }}
+          >
+            <p className="text-sm font-medium" style={{ color: '#3590F3' }}>
+              Tu solicitud está siendo revisada. Una vez que el equipo confirme la tarifa final, podrás visualizar el seguimiento de los camiones.
+            </p>
+          </div>
         )}
+        <TripSummaryCard
+          trip={trip}
+          onVerDetalle={() => trucksRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        />
       </div>
+
+      {/* ── Desktop layout ───────────────────────── hidden md:flex */}
+      <div className="hidden md:flex md:flex-col md:gap-6">
+        {/* Breadcrumb + date */}
+        <div className="flex items-center justify-between">
+          <Breadcrumb parentLabel="Mis Viajes" parentPath="/viajes" currentLabel="Detalle del viaje" />
+          <span className="text-sm text-gray-400">{formatDate(trip.fechaProgramada)}</span>
+        </div>
+
+        {/* Title + actions */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Viaje {trip.numeroViaje ? `#${trip.numeroViaje}` : ''}
+            </h1>
+            <StatusBadge status={trip.estado} />
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => setShowDetailModal(true)}>
+              Ver detalle
+            </Button>
+            {canTrack && (
+              <Button onClick={() => setShowTracking((v) => !v)}>
+                {showTracking ? 'Ocultar mapa' : 'Ver tracking'}
+              </Button>
+            )}
+          </div>
+        </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -213,6 +260,7 @@ export const ViajeDetalle = () => {
           </p>
         </div>
       </div>
+      </div>{/* end desktop layout */}
 
       {/* Tracking map (conditional) */}
       {showTracking && canTrack && (
@@ -232,10 +280,50 @@ export const ViajeDetalle = () => {
       )}
 
       {/* Detalle de camiones */}
-      <div className="bg-white rounded-2xl shadow border border-[#DEDEDE] p-6">
-        <h2 className="text-base font-semibold text-gray-900">Detalle de camiones</h2>
+      <div ref={trucksRef} className="flex flex-col gap-3 md:gap-0 md:bg-white md:rounded-2xl md:shadow md:border md:border-[#DEDEDE] md:overflow-hidden">
+
+        {/* Title + progress — floating on mobile, inside card on desktop */}
+        <div className="md:px-6 md:pt-5 md:pb-4">
+          <h2 className="text-base font-semibold text-gray-900">Detalle de camiones</h2>
+          {assignedTrucks.length > 0 && (() => {
+            const covered = assignedTrucks.filter(
+              (r) => r.estado && r.estado !== 'pendiente'
+            ).length;
+            const total = assignedTrucks.length;
+            const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
+            return (
+              <div
+                className="mt-3 p-3"
+                style={{ background: '#F1F8F3', border: '1px solid #BFDBC5', borderRadius: 16 }}
+              >
+                {/* Mobile: stacked */}
+                <div className="md:hidden mb-2">
+                  <p className="text-sm font-semibold" style={{ color: '#45845C' }}>Progreso de asignación</p>
+                  <p className="text-sm font-medium" style={{ color: '#45845C' }}>{covered} de {total} camiones cubiertos</p>
+                </div>
+                {/* Desktop: inline */}
+                <div className="hidden md:flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold" style={{ color: '#45845C' }}>Progreso de asignación</span>
+                  <span className="text-sm font-medium" style={{ color: '#45845C' }}>{covered} de {total} camiones cubiertos</span>
+                </div>
+                <div className="w-full h-2 rounded-full" style={{ background: '#DEEDE0' }}>
+                  <div
+                    className="h-2 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${pct}%`,
+                      background: 'linear-gradient(90deg, #37784C, #5F9C73)',
+                      minWidth: pct > 0 ? 8 : 0,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Truck list — own white card on mobile, seamless on desktop */}
         {assignedTrucks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="bg-white rounded-2xl border border-[#DEDEDE] md:border-0 md:rounded-none flex flex-col items-center justify-center py-16 px-6 text-center">
             <EmptyIllustration />
             <p className="mt-5 text-base font-semibold text-gray-700">Aún no hay datos para mostrar</p>
             <p className="mt-1 text-sm text-gray-400">
@@ -243,51 +331,118 @@ export const ViajeDetalle = () => {
             </p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-[#DEDEDE] mt-4">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead style={{ background: '#F6F6F6' }}>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-[#363636]">ID Camión</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-[#363636]">Tipo</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-[#363636]">Estado</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-[#363636]">Chofer</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-[#363636]">Patente</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-[#363636]">Carta de porte</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {assignedTrucks.map((row, i) => (
-                    <tr key={row._id || i} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {row.truckId || row._id?.slice(-6).toUpperCase() || `C-${i + 1}`}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#363636]">{row.tipo || '—'}</td>
-                      <td className="px-6 py-4">
+          <>
+            {/* Mobile: lista numerada */}
+            <div className="md:hidden bg-white rounded-2xl border border-[#DEDEDE] overflow-hidden divide-y divide-[#DEDEDE]">
+              {assignedTrucks.map((row, i) => {
+                const choferName = row.chofer?.nombre || row.choferNombre || 'Sin chofer';
+                const patente = row.patente ||
+                  (row.camionOptions?.find((c) => c._id === row.camionId)?.patente) ||
+                  'Patente a confirmar';
+                const truckId = row.truckId || row._id?.slice(-6).toUpperCase() || `C-${i + 1}`;
+                return (
+                  <div
+                    key={row._id || i}
+                    className="flex items-center gap-3 px-4 py-4 bg-white cursor-pointer active:bg-gray-50"
+                    onClick={() => setSelectedTruckIdx(i)}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-[#F6F6F6] flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-semibold text-[#888888]">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-semibold text-[#363636]">{choferName}</span>
                         <StatusBadge status={row.estado || row.status || 'pendiente'} />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#363636]">
-                        {row.chofer?.nombre ||
-                          row.choferNombre ||
-                          (row.choferOptions?.find((c) => c._id === row.choferId)?.name) ||
-                          '—'}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#363636]">
-                        {row.patente ||
-                          (row.camionOptions?.find((c) => c._id === row.camionId)?.patente) ||
-                          '—'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusBadge status={row.cartaDePorte || 'pendiente'} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {`#${truckId}`}
+                        {' • '}
+                        {patente}
+                      </p>
+                    </div>
+                    <div className="w-9 h-9 rounded-full border border-[#DEDEDE] bg-white flex items-center justify-center flex-shrink-0">
+                      <img src={arrowRightSvg} alt="" width={20} height={20} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+
+            {/* Desktop: tabla */}
+            <div className="hidden md:block border-t border-[#DEDEDE] px-6 py-6">
+              <DataTable
+                columns={[
+                  { key: 'id', label: 'ID Camión' },
+                  { key: 'tipo', label: 'Tipo' },
+                  { key: 'estado', label: 'Estado' },
+                  { key: 'chofer', label: 'Chofer' },
+                  { key: 'patente', label: 'Patente' },
+                  { key: 'carta', label: 'Carta de porte' },
+                  { key: 'seguimiento', label: 'Seguimiento' },
+                  { key: 'accionable', label: 'Accionable', align: 'right' },
+                ]}
+                data={assignedTrucks}
+                renderRow={(row, i) => (
+                  <tr key={row._id || i} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      {row.truckId || row._id?.slice(-6).toUpperCase() || `C-${i + 1}`}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-[#363636]">{row.tipo || '—'}</td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={row.estado || row.status || 'pendiente'} />
+                    </td>
+                    <td className="px-6 py-4 text-sm text-[#363636]">
+                      {row.chofer?.nombre ||
+                        row.choferNombre ||
+                        (row.choferOptions?.find((c) => c._id === row.choferId)?.name) ||
+                        '—'}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-[#363636]">
+                      {row.patente ||
+                        (row.camionOptions?.find((c) => c._id === row.camionId)?.patente) ||
+                        '—'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={row.cartaDePorte || 'pendiente'} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <Button variant="outline" size="sm" disabled>
+                        Ver ubicación
+                      </Button>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Button variant="outline" size="sm" onClick={() => setSelectedTruckIdx(i)}>
+                        Ver detalle
+                      </Button>
+                    </td>
+                  </tr>
+                )}
+              />
+            </div>
+          </>
         )}
       </div>
+
+      {/* Notas */}
+      {/* Trip detail modal (desktop) */}
+      <TripDetailModal
+        isOpen={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        trip={trip}
+      />
+
+      {selectedTruckIdx !== null && (
+        <TruckDetailSheet
+          truck={assignedTrucks[selectedTruckIdx]}
+          index={selectedTruckIdx}
+          total={assignedTrucks.length}
+          onClose={() => setSelectedTruckIdx(null)}
+          onPrev={() => setSelectedTruckIdx((i) => Math.max(0, i - 1))}
+          onNext={() => setSelectedTruckIdx((i) => Math.min(assignedTrucks.length - 1, i + 1))}
+        />
+      )}
 
       {/* Notas */}
       {trip.notas && (
