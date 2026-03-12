@@ -5,6 +5,8 @@ import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SolicitarViaje } from './pages/SolicitarViaje';
+import { SolicitarViajeIntro } from './pages/SolicitarViajeIntro';
+import { SolicitarViajeResumen } from './pages/SolicitarViajeResumen';
 import { MisViajes } from './pages/MisViajes';
 import { ViajeDetalle } from './pages/ViajeDetalle';
 import { ForgotPassword } from './pages/ForgotPassword';
@@ -48,9 +50,25 @@ function App() {
             path="/solicitar-viaje"
             element={
               <ProtectedRoute>
-                <Layout>
-                  <SolicitarViaje />
-                </Layout>
+                <SolicitarViajeIntro />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/solicitar-viaje/form"
+            element={
+              <ProtectedRoute>
+                <SolicitarViaje />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/solicitar-viaje/resumen"
+            element={
+              <ProtectedRoute>
+                <SolicitarViajeResumen />
               </ProtectedRoute>
             }
           />
