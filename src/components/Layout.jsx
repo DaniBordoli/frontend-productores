@@ -58,22 +58,14 @@ export const Layout = ({ children }) => {
     <div className="min-h-screen bg-[#F6F6F6]">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 h-screen transition-transform ${
+        className={`fixed top-[72px] md:top-0 left-0 z-40 h-[calc(100vh-72px)] md:h-screen transition-transform ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } bg-white border-r border-gray-200 w-64`}
       >
         <div className="h-full flex flex-col">
-          {/* Logo */}
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <img src={logo} alt="Ruta y Campo" className="h-10 w-auto" />
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
+          {/* Logo - desktop only */}
+          <div className="hidden md:flex p-4 items-center justify-between">
+            <img src={logo} alt="Ruta y Campo" className="h-10 w-auto" />
           </div>
 
           {/* Navigation */}
@@ -122,17 +114,21 @@ export const Layout = ({ children }) => {
       </aside>
 
       {/* Main content */}
-      <div className={`${sidebarOpen ? 'ml-64' : 'ml-0'} transition-all`}>
+      <div className={`${sidebarOpen ? 'md:ml-64' : ''} transition-all`}>
         {/* Header */}
-        <header className="bg-[#FDFDFD] border-b border-[#DEDEDE] md:border-gray-200">
+        <header className="bg-[#FDFDFD] border-b border-[#DEDEDE] relative z-50">
           <div className="px-6 py-4 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title={sidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
             >
-              {/* Mobile: Menu.svg / Desktop: SidebarIcon */}
-              <img src={MenuIcon} alt="Toggle sidebar" className="w-5 h-5 md:hidden" />
+              {/* Mobile: X cuando abierto, Menu cuando cerrado */}
+              {sidebarOpen
+                ? <X className="w-5 h-5 text-gray-600 md:hidden" />
+                : <img src={MenuIcon} alt="Abrir menú" className="w-5 h-5 md:hidden" />
+              }
+              {/* Desktop: siempre SidebarIcon */}
               <img src={SidebarIcon} alt="Toggle sidebar" className="w-5 h-5 hidden md:block" />
             </button>
 
@@ -163,7 +159,7 @@ export const Layout = ({ children }) => {
       {sidebarOpen && (
         <div
           role="presentation"
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          className="fixed top-[72px] md:top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
           onKeyDown={() => setSidebarOpen(false)}
         />

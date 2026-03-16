@@ -15,6 +15,10 @@ const STATUS_VARIANT_MAP = {
   [TRIP_STATUS.EN_ASIGNACION]: 'blue',
   [TRIP_STATUS.EN_CURSO]: 'yellow',
   [TRIP_STATUS.FINALIZADO]: 'green',
+  pendiente: 'yellow',
+  aprobada: 'green',
+  confirmada: 'green',
+  propuesta: 'yellow',
 };
 
 export const StatusBadge = ({ status, variant, label }) => {

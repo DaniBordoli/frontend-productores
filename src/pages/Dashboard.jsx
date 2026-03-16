@@ -417,6 +417,24 @@ export const Dashboard = () => {
           </div>
         </section>
       </div>
+
+      {/* Mobile FAB – Solicitar viaje */}
+      <Link
+        to="/solicitar-viaje"
+        className="md:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center"
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #37784C, #5F9C73)',
+          boxShadow: '0 4px 16px rgba(55,120,76,0.4)',
+          padding: 19.5,
+        }}
+      >
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+          <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 7C12.5523 7 13 7.44772 13 8V11H16C16.5523 11 17 11.4477 17 12C17 12.5523 16.5523 13 16 13H13V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V13H8C7.44772 13 7 12.5523 7 12C7 11.4477 7.44772 11 8 11H11V8C11 7.44772 11.4477 7 12 7Z" fill="white"/>
+        </svg>
+      </Link>
     </div>
   );
 };

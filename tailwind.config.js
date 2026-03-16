@@ -46,6 +46,20 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        'slide-up': {
+          from: { transform: 'translateY(100%)' },
+          to:   { transform: 'translateY(0)' },
+        },
+        'slide-from-right': {
+          from: { transform: 'translateX(100%)' },
+          to:   { transform: 'translateX(0)' },
+        },
+      },
+      animation: {
+        'slide-up': 'slide-up 0.3s cubic-bezier(0.32,0.72,0,1)',
+        'slide-from-right': 'slide-from-right 0.3s cubic-bezier(0.32,0.72,0,1)',
+      },
     },
   },
   plugins: [],

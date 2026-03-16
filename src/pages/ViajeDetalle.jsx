@@ -274,6 +274,14 @@ export const ViajeDetalle = () => {
           </div>
         </div>
       )}
+
+      {/* Notas */}
+      {trip.notas && (
+        <div className="bg-white rounded-2xl shadow border border-[#DEDEDE] p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-3">Notas</h2>
+          <p className="text-sm text-gray-600 whitespace-pre-wrap">{trip.notas}</p>
+        </div>
+      )}
     </div>
   );
 };
