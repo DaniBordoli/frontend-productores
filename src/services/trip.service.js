@@ -30,6 +30,12 @@ const tripService = {
     const response = await api.patch(`/trips/${id}/propose-price`, { price });
     return response.data;
   },
+
+  // Calcular precio estimado
+  calculatePrice: async ({ origen, destino, distancia, peso }) => {
+    const response = await api.post('/rates/calculate', { origen, destino, distancia, peso });
+    return response.data;
+  },
 };
 
 export default tripService;

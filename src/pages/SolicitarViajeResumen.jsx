@@ -1,16 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronDown, Truck, AlertTriangle, PlusCircle } from 'lucide-react';
+import { X, ArrowLeft, ChevronDown, Truck, AlertTriangle, PlusCircle, Loader2 } from 'lucide-react';
 import logo from '../assets/rutaycampoLogo.svg';
 import tripService from '../services/trip.service';
 import { Button, PillInput } from '../components/ui';
-
-const PRECIO_COMUN = 30_000_000;
-const PRECIO_ESCALABLE = 48_000_000;
-const TARIFA_KM = 4_000;
-const DISTANCIA_KM = 150;
-const TONELADAS_COMUN = 50;
-const TONELADAS_ESCALABLE = 80;
 
 const formatNum = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
 
@@ -164,6 +157,10 @@ export const SolicitarViajeResumen = () => {
   const [showNegociar, setShowNegociar] = useState(false);
   const [tarifaPropuesta, setTarifaPropuesta] = useState(null);
   const [pedidoCreado, setPedidoCreado] = useState(false);
+  const [createdTripId, setCreatedTripId] = useState(null);
+  const [pricing, setPricing] = useState(null);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingError, setPricingError] = useState('');
 
   if (!formData) {
     navigate('/solicitar-viaje', { replace: true });
@@ -172,9 +169,38 @@ export const SolicitarViajeResumen = () => {
 
   const nComunes = parseInt(formData.camionesComunes || 0);
   const nEscalables = parseInt(formData.camionesEscalables || 0);
-  const totalComun = nComunes * PRECIO_COMUN;
-  const totalEscalable = nEscalables * PRECIO_ESCALABLE;
-  const total = totalComun + totalEscalable;
+
+  // Use backend price if available, else fall back to null
+  const precioUnitario = pricing?.basePrice ?? null;
+  const totalComun = precioUnitario !== null ? nComunes * precioUnitario : null;
+  const totalEscalable = precioUnitario !== null ? nEscalables * precioUnitario : null;
+  const total = precioUnitario !== null ? (totalComun + totalEscalable) : null;
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const load = async () => {
+      setPricingLoading(true);
+      setPricingError('');
+      try {
+        const result = await tripService.calculatePrice({
+          origen: formData.origen,
+          destino: formData.destino,
+          distancia: null,
+          peso: formData.peso ? Number(formData.peso) : null,
+        });
+        setPricing(result);
+      } catch (err) {
+        setPricingError(
+          err.response?.status === 404
+            ? 'No hay tarifa configurada para esta ruta. El equipo te contactará con un precio.'
+            : 'No se pudo calcular el precio. El equipo te contactará.'
+        );
+      } finally {
+        setPricingLoading(false);
+      }
+    };
+    load();
+  }, []);
 
   const fechaFormateada = formData.fecha
     ? new Date(formData.fecha + 'T00:00:00').toLocaleDateString('es-AR')
@@ -198,18 +224,28 @@ export const SolicitarViajeResumen = () => {
     setError('');
     try {
       const camionesTotal = nComunes + nEscalables;
-      await tripService.create({
+      const result = await tripService.create({
         origen: formData.origen,
         destino: formData.destino,
         tipoDestino: formData.tipoDestino,
         fechaProgramada: `${formData.fecha}T${formData.hora}`,
         tipoCarga: formData.grano,
+        peso: Number(formData.peso),
         camionesSolicitados: camionesTotal,
         camionesRecomendados: camionesTotal,
         camionesComunes: nComunes,
         camionesEscalables: nEscalables,
         notas: formData.notas,
+        ...(total !== null ? { precios: { precioBase: total } } : {}),
       });
+      const tripId = result?.trip?._id || result?._id;
+      setCreatedTripId(tripId);
+      // If user proposed a custom price, send it
+      if (tarifaPropuesta && tripId) {
+        try {
+          await tripService.proposePrice(tripId, Number(tarifaPropuesta));
+        } catch (_) { /* non-fatal */ }
+      }
       setPedidoCreado(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Error al crear la solicitud');
@@ -362,111 +398,105 @@ export const SolicitarViajeResumen = () => {
               <SectionHeader
                 title="Valor total"
                 badge={tarifaPropuesta ? 'Tarifa a negociar' : undefined}
-                actionLabel="Negociar"
+                actionLabel={!pricingLoading && !pricingError ? 'Negociar' : undefined}
                 onAction={() => setShowNegociar(true)}
               />
 
-              {nComunes > 0 && (
-                <>
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-3 py-3 border-b border-gray-100 text-left"
-                    onClick={() => setExpandComun((v) => !v)}
-                  >
-                    <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      <Truck className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">Camiones comunes</p>
-                      <p className="text-xs text-gray-400">{nComunes} unidades</p>
-                    </div>
-                    <span className="text-sm font-semibold text-gray-900 mr-1">
-                      {formatPrice(totalComun)}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
-                        expandComun ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandComun && (
-                    <div className="mb-3 rounded-2xl px-5 py-4 text-sm" style={{ background: '#F6F6F6', color: '#7A7A7A' }}>
-                      <div className="flex justify-between py-1.5">
-                        <span>Tarifa x km</span><span>{formatNum(TARIFA_KM)}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Distancia</span><span>{formatNum(DISTANCIA_KM)}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Toneladas</span><span>{formatNum(TONELADAS_COMUN)}</span>
-                      </div>
-                      <div className="border-t my-2" style={{ borderColor: '#E0E0E0' }} />
-                      <div className="flex justify-between py-1.5">
-                        <span>Valor del camión</span><span>{formatNum(PRECIO_COMUN)}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Valor {nComunes} camiones</span><span>{formatNum(totalComun)}</span>
-                      </div>
-                    </div>
-                  )}
-                </>
+              {pricingLoading && (
+                <div className="flex items-center gap-2 py-4 text-sm text-gray-400">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Calculando tarifa...
+                </div>
               )}
 
-              {nEscalables > 0 && (
-                <>
-                  <button
-                    type="button"
-                    className="w-full flex items-center gap-3 py-3 border-b border-gray-100 text-left"
-                    onClick={() => setExpandEscalable((v) => !v)}
-                  >
-                    <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      <Truck className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">Camiones escalables</p>
-                      <p className="text-xs text-gray-400">{nEscalables} unidades</p>
-                    </div>
-                    <span className="text-sm font-semibold text-gray-900 mr-1">
-                      {formatPrice(totalEscalable)}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
-                        expandEscalable ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandEscalable && (
-                    <div className="mb-3 rounded-2xl px-5 py-4 text-sm" style={{ background: '#F6F6F6', color: '#7A7A7A' }}>
-                      <div className="flex justify-between py-1.5">
-                        <span>Tarifa x km</span><span>{formatNum(TARIFA_KM)}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Distancia</span><span>{formatNum(DISTANCIA_KM)}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Toneladas</span><span>{formatNum(TONELADAS_ESCALABLE)}</span>
-                      </div>
-                      <div className="border-t my-2" style={{ borderColor: '#E0E0E0' }} />
-                      <div className="flex justify-between py-1.5">
-                        <span>Valor del camión</span><span>{formatNum(PRECIO_ESCALABLE)}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span>Valor {nEscalables} camiones</span><span>{formatNum(totalEscalable)}</span>
-                      </div>
-                    </div>
-                  )}
-                </>
+              {!pricingLoading && pricingError && (
+                <div className="flex items-start gap-2 bg-yellow-50 text-yellow-700 text-xs px-4 py-3 rounded-xl mb-3">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span>{pricingError}</span>
+                </div>
               )}
 
-              <div className="flex justify-between items-center py-3">
-                <span className="text-base font-bold text-gray-900">Total</span>
-                <span className="text-base font-bold text-gray-900">{formatPrice(total)}</span>
-              </div>
+              {!pricingLoading && !pricingError && precioUnitario !== null && (
+                <>
+                  {nComunes > 0 && (
+                    <>
+                      <button
+                        type="button"
+                        className="w-full flex items-center gap-3 py-3 border-b border-gray-100 text-left"
+                        onClick={() => setExpandComun((v) => !v)}
+                      >
+                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <Truck className="w-4 h-4 text-gray-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Camiones comunes</p>
+                          <p className="text-xs text-gray-400">{nComunes} unidades</p>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 mr-1">
+                          {formatPrice(totalComun)}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${expandComun ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandComun && (
+                        <div className="mb-3 rounded-2xl px-5 py-4 text-sm" style={{ background: '#F6F6F6', color: '#7A7A7A' }}>
+                          <div className="flex justify-between py-1.5">
+                            <span>Precio base por camión</span><span>{formatNum(precioUnitario)}</span>
+                          </div>
+                          <div className="border-t my-2" style={{ borderColor: '#E0E0E0' }} />
+                          <div className="flex justify-between py-1.5">
+                            <span>Valor {nComunes} camiones</span><span>{formatNum(totalComun)}</span>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {nEscalables > 0 && (
+                    <>
+                      <button
+                        type="button"
+                        className="w-full flex items-center gap-3 py-3 border-b border-gray-100 text-left"
+                        onClick={() => setExpandEscalable((v) => !v)}
+                      >
+                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <Truck className="w-4 h-4 text-gray-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Camiones escalables</p>
+                          <p className="text-xs text-gray-400">{nEscalables} unidades</p>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 mr-1">
+                          {formatPrice(totalEscalable)}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${expandEscalable ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expandEscalable && (
+                        <div className="mb-3 rounded-2xl px-5 py-4 text-sm" style={{ background: '#F6F6F6', color: '#7A7A7A' }}>
+                          <div className="flex justify-between py-1.5">
+                            <span>Precio base por camión</span><span>{formatNum(precioUnitario)}</span>
+                          </div>
+                          <div className="border-t my-2" style={{ borderColor: '#E0E0E0' }} />
+                          <div className="flex justify-between py-1.5">
+                            <span>Valor {nEscalables} camiones</span><span>{formatNum(totalEscalable)}</span>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-base font-bold text-gray-900">Total</span>
+                    <span className="text-base font-bold text-gray-900">
+                      {tarifaPropuesta ? formatPrice(Number(tarifaPropuesta)) : formatPrice(total)}
+                    </span>
+                  </div>
+                </>
+              )}
 
               <div className="flex items-start gap-2 bg-yellow-50 text-yellow-700 text-xs px-4 py-3 rounded-xl">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>
-                 No se realizará ningún cobro ahora. Nos contactaremos para avanzar con el pago.
+                  No se realizará ningún cobro ahora. Nos contactaremos para avanzar con el pago.
                 </span>
               </div>
             </div>

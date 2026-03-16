@@ -22,15 +22,20 @@ const PlacesAutocomplete = ({ label, value, onPlaceSelect, required = false, pla
       let ciudad = '';
       let provincia = '';
 
-      for (const component of place.address_components || []) {
-        const types = component.types;
-        if (types.includes('locality') || types.includes('administrative_area_level_2')) {
-          ciudad = component.long_name;
-        }
-        if (types.includes('administrative_area_level_1')) {
-          provincia = component.long_name;
-        }
-      }
+      const get = (types) => {
+        const c = (place.address_components || []).find(comp =>
+          types.some(t => comp.types.includes(t))
+        );
+        return c?.long_name || '';
+      };
+
+      ciudad =
+        get(['locality']) ||
+        get(['sublocality', 'sublocality_level_1']) ||
+        get(['administrative_area_level_2']) ||
+        get(['administrative_area_level_3']) ||
+        get(['administrative_area_level_1']);
+      provincia = get(['administrative_area_level_1']);
 
       onPlaceSelect({
         direccion,
