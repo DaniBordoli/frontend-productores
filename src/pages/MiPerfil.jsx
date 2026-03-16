@@ -8,7 +8,7 @@ export const MiPerfil = () => {
 
   const [profileForm, setProfileForm] = useState({
     nombre: user?.nombre || '',
-    telefono: user?.telefono || '',
+    telefono: user?.telefono || '+54 ',
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -32,6 +32,14 @@ export const MiPerfil = () => {
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'telefono') {
+      const prefix = '+54 ';
+      const ensured = value.startsWith(prefix) ? value : prefix + value.replace(/^\+54\s?/, '');
+      setProfileForm((prev) => ({ ...prev, telefono: ensured }));
+      setProfileError('');
+      setProfileSuccess('');
+      return;
+    }
     setProfileForm((prev) => ({ ...prev, [name]: value }));
     setProfileError('');
     setProfileSuccess('');

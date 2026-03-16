@@ -63,7 +63,7 @@ export const ProposePrice = ({ trip, onPropose, onClose }) => {
               required
               min="0"
               step="0.01"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-lg"
               placeholder="Ej: 150000"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -82,7 +82,7 @@ export const ProposePrice = ({ trip, onPropose, onClose }) => {
             <button
               type="submit"
               disabled={loading || !price}
-              className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Enviando...' : 'Proponer'}
             </button>
