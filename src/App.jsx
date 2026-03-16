@@ -8,7 +8,6 @@ import { SolicitarViaje } from './pages/SolicitarViaje';
 import { SolicitarViajeIntro } from './pages/SolicitarViajeIntro';
 import { SolicitarViajeResumen } from './pages/SolicitarViajeResumen';
 import { MisViajes } from './pages/MisViajes';
-import { Viajes } from './pages/Viajes';
 import { ViajeDetalle } from './pages/ViajeDetalle';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
@@ -41,7 +40,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <Viajes />
+                  <MisViajes />
                 </Layout>
               </ProtectedRoute>
             }
