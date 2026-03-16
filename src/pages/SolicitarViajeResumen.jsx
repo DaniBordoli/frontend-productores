@@ -66,7 +66,7 @@ function NegociarModal({ tarifaActual, onClose, onConfirm }) {
         </div>
 
         <p className="px-8 mt-3 text-sm text-gray-500 leading-relaxed">
-          Proponé un valor de km x tn. Será evaluado por el equipo de logística y te contactarán para definir la tarifa final.
+          Ingresá tu propuesta de tarifa total para el viaje. Luego será evaluada por el equipo de logística y te contactarán para definir la tarifa final.
         </p>
 
         <div className="mx-8 mt-6 bg-gray-50 rounded-2xl px-5 py-4">
@@ -290,9 +290,7 @@ export const SolicitarViajeResumen = () => {
         setPricing(result);
       } catch (err) {
         setPricingError(
-          err.response?.status === 404
-            ? 'No hay tarifa configurada para esta ruta. El equipo te contactará con un precio.'
-            : 'No se pudo calcular el precio. El equipo te contactará.'
+          err.response?.data?.message || 'No se pudo calcular el precio. El equipo te contactará.'
         );
       } finally {
         setPricingLoading(false);
@@ -338,7 +336,12 @@ export const SolicitarViajeResumen = () => {
         camionesEscalables: nEscalables,
         notas: formData.notas,
         ...(distanciaKm ? { distanciaKm } : {}),
-        ...(totalEfectivo !== null ? { precios: { precioBase: totalEfectivo } } : {}),
+        ...(totalEfectivo !== null ? {
+          precios: {
+            precioBase: totalEfectivo,
+            ...(pricing?.tarifaKmTn ? { tarifaKmTn: pricing.tarifaKmTn } : {}),
+          }
+        } : {}),
       });
       const tripId = result?.trip?._id || result?._id;
       setCreatedTripId(tripId);
@@ -504,12 +507,26 @@ export const SolicitarViajeResumen = () => {
 
             {/* Valor total */}
             <div className="border-t border-gray-100 mt-5 pt-5">
-              <SectionHeader
-                title="Valor total"
-                badge={tarifaPropuesta ? 'Tarifa a negociar' : undefined}
-                actionLabel={!pricingLoading && !pricingError ? 'Negociar' : undefined}
-                onAction={() => setShowNegociar(true)}
-              />
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg font-bold text-gray-900">Valor total</h3>
+                  {tarifaPropuesta && (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border" style={{ background: '#FEFCE8', color: '#A16207', borderColor: '#FDE68A' }}>
+                      Tarifa a negociar
+                      <span style={{ color: '#CA8A04' }}>›</span>
+                    </span>
+                  )}
+                </div>
+                {!pricingLoading && !pricingError && pricing !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setShowNegociar(true)}
+                    className="text-sm text-[#45845C] underline hover:opacity-75 transition-opacity focus:outline-none"
+                  >
+                    Negociar
+                  </button>
+                )}
+              </div>
 
               {pricingLoading && (
                 <div className="flex items-center gap-2 py-4 text-sm text-gray-400">
