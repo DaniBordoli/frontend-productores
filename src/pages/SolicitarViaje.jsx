@@ -166,9 +166,14 @@ function Step3({ data, onChange, errors }) {
             icon={<Truck className="w-4 h-4" />}
             type="number"
             min="0"
+            max="50"
             placeholder="0"
             value={data.camionesComunes}
-            onChange={e => onChange(null, 'camionesComunes', e.target.value)}
+            onChange={e => {
+              const v = e.target.value.replace(/[^0-9]/g, '');
+              const n = parseInt(v, 10);
+              if (v === '' || (n >= 0 && n <= 50)) onChange(null, 'camionesComunes', v);
+            }}
             error={errors['camionesComunes']}
           />
         </FormField>
@@ -177,9 +182,14 @@ function Step3({ data, onChange, errors }) {
             icon={<Truck className="w-4 h-4" />}
             type="number"
             min="0"
+            max="50"
             placeholder="0"
             value={data.camionesEscalables}
-            onChange={e => onChange(null, 'camionesEscalables', e.target.value)}
+            onChange={e => {
+              const v = e.target.value.replace(/[^0-9]/g, '');
+              const n = parseInt(v, 10);
+              if (v === '' || (n >= 0 && n <= 50)) onChange(null, 'camionesEscalables', v);
+            }}
             error={errors['camionesEscalables']}
           />
         </FormField>
@@ -269,8 +279,14 @@ export const SolicitarViaje = () => {
     }
     if (s === 3) {
       if (!formData.grano) e['grano'] = 'Campo requerido';
-      if (!formData.camionesComunes && !formData.camionesEscalables) {
+      const nComunes = parseInt(formData.camionesComunes || 0);
+      const nEscalables = parseInt(formData.camionesEscalables || 0);
+      if (!nComunes && !nEscalables) {
         e['camionesComunes'] = 'Ingresá al menos un tipo de camión';
+      } else if (nComunes < 0 || nEscalables < 0) {
+        e['camionesComunes'] = 'La cantidad de camiones no puede ser negativa';
+      } else if (nComunes > 50 || nEscalables > 50) {
+        e['camionesComunes'] = 'La cantidad máxima por tipo es 50 camiones';
       }
     }
     return e;
