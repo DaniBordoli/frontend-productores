@@ -115,12 +115,12 @@ export const ViajeDetalle = () => {
   const distanceKm = trip.distancia ? `${trip.distancia} km` : null;
   const requestedTrucks = trip.camionesSolicitados ?? 0;
   const assignedTrucks = [
-    { _id: '1', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '2', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '3', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '4', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-    { _id: '5', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-    { _id: '6', truckId: 'AO-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
+    { _id: '1', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
+    { _id: '2', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
+    { _id: '3', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
+    { _id: '4', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
+    { _id: '5', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
+    { _id: '6', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
   ]; // TODO: remove mock
   const canTrack = trip.estado === 'en_curso' && (trip.trackingActivo || trip.rutaCompleta?.length > 0);
 

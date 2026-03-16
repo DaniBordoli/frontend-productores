@@ -21,7 +21,6 @@ const FILTER_SECTIONS = [
     key: 'estado',
     options: [
       { label: 'Solicitado', value: 'solicitado' },
-      { label: 'Cotizando', value: 'cotizando' },
       { label: 'Confirmado', value: 'confirmado' },
       { label: 'En asignación', value: 'en_asignacion' },
       { label: 'En curso', value: 'en_curso' },

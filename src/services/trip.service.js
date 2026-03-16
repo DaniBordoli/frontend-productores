@@ -32,8 +32,14 @@ const tripService = {
   },
 
   // Calcular precio estimado
-  calculatePrice: async ({ origen, destino, distancia, peso }) => {
-    const response = await api.post('/rates/calculate', { origen, destino, distancia, peso });
+  calculatePrice: async ({ origen, destino, distancia, camionesComunes, camionesEscalables }) => {
+    const response = await api.post('/rates/calculate', { origen, destino, distancia, camionesComunes, camionesEscalables });
+    return response.data;
+  },
+
+  // Obtener ruta (proxy Routes API)
+  getRoute: async ({ originLat, originLng, destLat, destLng }) => {
+    const response = await api.post('/rates/route', { originLat, originLng, destLat, destLng });
     return response.data;
   },
 };

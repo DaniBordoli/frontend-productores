@@ -159,21 +159,6 @@ function Step3({ data, onChange, errors }) {
         </FormField>
       </div>
 
-      {/* Peso */}
-      <div className="mb-3">
-        <FormField label="Peso total (toneladas)*" error={errors['peso']}>
-          <PillInput
-            icon={<Truck className="w-4 h-4" />}
-            type="number"
-            min="0"
-            placeholder="Ej: 300"
-            value={data.peso}
-            onChange={e => onChange(null, 'peso', e.target.value)}
-            error={errors['peso']}
-          />
-        </FormField>
-      </div>
-
       {/* Camiones side by side */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
         <FormField label="Camiones comunes*" error={errors['camionesComunes']}>
@@ -232,7 +217,6 @@ const EMPTY_FORM = {
   fecha: '',
   hora: '',
   grano: '',
-  peso: '',
   camionesComunes: '',
   camionesEscalables: '',
   notas: '',
@@ -250,7 +234,7 @@ export const SolicitarViaje = () => {
   useEffect(() => {
     if (window.google?.maps) return;
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,directions`;
     script.async = true;
     script.onload = () => setMapsLoaded(true);
     document.head.appendChild(script);
@@ -285,7 +269,6 @@ export const SolicitarViaje = () => {
     }
     if (s === 3) {
       if (!formData.grano) e['grano'] = 'Campo requerido';
-      if (!formData.peso || Number(formData.peso) <= 0) e['peso'] = 'Campo requerido';
       if (!formData.camionesComunes && !formData.camionesEscalables) {
         e['camionesComunes'] = 'Ingresá al menos un tipo de camión';
       }
@@ -362,7 +345,9 @@ export const SolicitarViaje = () => {
 
       {/* Desktop header */}
       <div className="hidden lg:flex items-center px-4 py-4 gap-4">
-        <img src={logo} alt="Ruta y Campo" className="w-10 h-10 flex-shrink-0" />
+        <button type="button" onClick={() => navigate('/')} className="focus:outline-none flex-shrink-0">
+          <img src={logo} alt="Ruta y Campo" className="w-10 h-10" />
+        </button>
         <div className="flex-1 flex justify-center">
           <div className="w-full max-w-2xl flex items-center gap-2">
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
