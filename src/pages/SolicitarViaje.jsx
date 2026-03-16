@@ -23,24 +23,14 @@ export const SolicitarViaje = () => {
   }, []);
 
   const [formData, setFormData] = useState({
-    origen: {
-      direccion: '',
-      ciudad: '',
-      provincia: '',
-      coordenadas: { latitud: null, longitud: null }
-    },
-    destino: {
-      direccion: '',
-      ciudad: '',
-      provincia: '',
-      coordenadas: { latitud: null, longitud: null }
-    },
+    origen: { direccion: '', ciudad: '', provincia: '', coordenadas: { latitud: null, longitud: null } },
+    destino: { direccion: '', ciudad: '', provincia: '', coordenadas: { latitud: null, longitud: null } },
     tipoDestino: 'puerto',
     fechaProgramada: '',
     tipoCarga: 'grano',
     peso: '',
     camionesSolicitados: '',
-    notas: ''
+    notas: '',
   });
 
   const handleChange = (e) => {
@@ -57,15 +47,13 @@ export const SolicitarViaje = () => {
     if (user?.activo === false) return;
     setError('');
     setLoading(true);
-
     try {
       const submitData = {
         ...formData,
         peso: parseFloat(formData.peso),
         camionesSolicitados: parseInt(formData.camionesSolicitados),
-        camionesRecomendados: parseInt(formData.camionesSolicitados)
+        camionesRecomendados: parseInt(formData.camionesSolicitados),
       };
-
       await tripService.create(submitData);
       navigate('/viajes');
     } catch (err) {
@@ -73,21 +61,23 @@ export const SolicitarViaje = () => {
     } finally {
       setLoading(false);
     }
-    if (s === 3) {
-      if (!formData.grano) e['grano'] = 'Campo requerido';
-      if (!formData.camionesComunes && !formData.camionesEscalables) {
-        e['camionesComunes'] = 'Ingresá al menos un tipo de camión';
-      }
-    }
-    return e;
   };
 
-  const handleNext = () => {
-    const errs = validateStep(step);
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    setErrors({});
-    setStep(s => s + 1);
-  };
+  return (
+    <div className="max-w-4xl mx-auto">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Volver
+      </button>
+
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-900">Solicitar Viaje</h1>
+          <p className="text-gray-600 mt-1">Completa los datos para solicitar un nuevo viaje</p>
+        </div>
 
         {user?.activo === false && (
           <div className="m-6 flex items-start gap-3 bg-amber-50 border border-amber-300 text-amber-800 px-4 py-4 rounded-xl">
@@ -173,17 +163,6 @@ export const SolicitarViaje = () => {
               </select>
             </div>
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate('/viajes')}
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-50 transition-colors focus:outline-none flex-shrink-0"
-          style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}
-          aria-label="Cerrar"
-        >
-          <X className="w-4 h-4 text-gray-600" />
-        </button>
-      </div>
 
           {/* Detalles del Viaje */}
           <div>
@@ -256,7 +235,7 @@ export const SolicitarViaje = () => {
                 />
               </div>
             </div>
-          )}
+          </div>
 
           {/* Notas */}
           <div>
@@ -274,16 +253,11 @@ export const SolicitarViaje = () => {
             />
           </div>
 
-          {/* Navigation buttons */}
-          <div className="hidden sm:flex gap-3 mt-8">
-            <Button variant="secondary" size="lg" onClick={handleBack}>
-              Atrás
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={step === TOTAL_STEPS ? handleCalculate : handleNext}
-              className="flex-1"
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
             >
               Cancelar
             </button>
@@ -295,23 +269,8 @@ export const SolicitarViaje = () => {
               {loading ? 'Enviando...' : 'Solicitar Viaje'}
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile sticky bottom button */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 px-4 pb-6 pt-3 bg-white">
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={step === TOTAL_STEPS ? handleCalculate : handleNext}
-          className="w-full"
-        >
-          {step === TOTAL_STEPS ? 'Calcular tarifa' : 'Continuar'}
-        </Button>
+        </form>
       </div>
     </div>
   );
 };
-
-
-
