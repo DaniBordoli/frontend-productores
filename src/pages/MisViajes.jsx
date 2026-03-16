@@ -84,7 +84,7 @@ export const MisViajes = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
       </div>
     );
   }
@@ -105,32 +105,32 @@ export const MisViajes = () => {
               placeholder="Buscar por número o ciudad..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setStatusFilter('')}
-              className={`px-3 py-1 rounded-lg text-sm ${!statusFilter ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${!statusFilter ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               Todos
             </button>
             <button
               onClick={() => setStatusFilter('solicitado')}
-              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'solicitado' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'solicitado' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               Solicitado
             </button>
             <button
               onClick={() => setStatusFilter('en_curso')}
-              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'en_curso' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'en_curso' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               En Curso
             </button>
             <button
               onClick={() => setStatusFilter('finalizado')}
-              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'finalizado' ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className={`px-3 py-1 rounded-lg text-sm ${statusFilter === 'finalizado' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               Finalizado
             </button>
@@ -198,7 +198,7 @@ export const MisViajes = () => {
 
                     {trip.transportista && (
                       <div className="mt-3 flex items-center gap-2 text-sm">
-                        <Truck className="w-4 h-4 text-primary-600" />
+                        <Truck className="w-4 h-4 text-emerald-600" />
                         <span className="text-gray-600">
                           Transportista: <span className="font-medium text-gray-900">{trip.transportista.nombreConductor}</span>
                         </span>
@@ -208,7 +208,7 @@ export const MisViajes = () => {
 
                   <Link
                     to={`/viajes/${trip._id}`}
-                    className="ml-4 p-2 text-primary-600 hover:bg-primary-50 rounded-lg"
+                    className="ml-4 p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
                     title="Ver detalles"
                   >
                     <Eye className="w-5 h-5" />

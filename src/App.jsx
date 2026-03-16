@@ -6,6 +6,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SolicitarViaje } from './pages/SolicitarViaje';
 import { MisViajes } from './pages/MisViajes';
+import { Viajes } from './pages/Viajes';
 import { ViajeDetalle } from './pages/ViajeDetalle';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
@@ -38,7 +39,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <MisViajes />
+                  <Viajes />
                 </Layout>
               </ProtectedRoute>
             }

@@ -7,9 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "set:dev": "vite --mode staging",
+    "set:prod": "vite --mode production"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
     "axios": "^1.13.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",

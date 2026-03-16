@@ -23,7 +23,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+    const isLoginPage = window.location.pathname === '/login';
+    const isProfileCheck = error.config?.url?.includes('/auth/profile');
+    if ((status === 401 || status === 403) && !isLoginPage && !isProfileCheck) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
