@@ -39,7 +39,11 @@ export function SetPassword() {
         setTokenStatus('valid');
       } catch (err) {
         setTokenStatus('invalid');
-        setTokenError(err.response?.data?.message || 'El enlace de invitación es inválido o ya expiró.');
+        if (!err.response) {
+          setTokenError('No se pudo conectar con el servidor. Intentá de nuevo en unos minutos.');
+        } else {
+          setTokenError(err.response?.data?.message || 'El enlace de invitación es inválido o ya expiró.');
+        }
       }
     };
     validateToken();
