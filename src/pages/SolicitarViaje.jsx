@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, ArrowLeft, MapPin, Building2, FileText, PlusCircle, Calendar, Clock, Truck, AlignLeft, Info } from 'lucide-react';
+import { X, ArrowLeft, PlusCircle, Calendar, Clock, Truck, AlignLeft, Info } from 'lucide-react';
 import logo from '../assets/rutaycampoLogo.svg';
+import PlacesAutocomplete from '../components/PlacesAutocomplete';
 
 import { Button, PillInput, PillSelect, FormField } from '../components/ui';
 
 const TOTAL_STEPS = 3;
 
-const PROVINCES = ['Buenos Aires'];
 
 const CARGO_TYPES = [
   { value: 'soja', label: 'Soja' },
@@ -26,94 +26,60 @@ const HORA_OPTIONS = [
 
 
 
-function Step1({ data, onChange, errors }) {
+function Step1({ data, onChange, errors, mapsLoaded }) {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900">Completá el recorrido del viaje</h2>
       <p className="text-sm text-gray-500 mt-1 mb-6">Indicanos el origen y destino de tu pedido.</p>
 
       <p className="text-lg font-bold text-gray-900 mb-3">Origen</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-        <FormField label="Calle*" error={errors['origen.direccion']}>
-          <PillInput
-            icon={<MapPin className="w-4 h-4" />}
-            placeholder="Av. Bartolomé Mitre 245"
-            value={data.origen.direccion}
-            onChange={e => onChange('origen', 'direccion', e.target.value)}
-            error={errors['origen.direccion']}
+      <div className="mb-3">
+        {mapsLoaded ? (
+          <PlacesAutocomplete
+            label="Dirección de origen*"
+            required
+            placeholder="Ej: Ruta 9 Km 123, Pergamino"
+            onPlaceSelect={(place) => {
+              onChange('origen', 'direccion', place.direccion);
+              onChange('origen', 'ciudad', place.ciudad);
+              onChange('origen', 'provincia', place.provincia);
+              onChange('origen', 'coordenadas', place.coordenadas);
+            }}
           />
-        </FormField>
-        <FormField label="Ciudad*" error={errors['origen.ciudad']}>
-          <PillInput
-            icon={<Building2 className="w-4 h-4" />}
-            placeholder="Villegas"
-            value={data.origen.ciudad}
-            onChange={e => onChange('origen', 'ciudad', e.target.value)}
-            error={errors['origen.ciudad']}
-          />
-        </FormField>
-        <FormField label="Provincia*" error={errors['origen.provincia']}>
-          <PillSelect
-            icon={<PlusCircle className="w-4 h-4" />}
-            value={data.origen.provincia}
-            onChange={e => onChange('origen', 'provincia', e.target.value)}
-            error={errors['origen.provincia']}
-          >
-            <option value="">Seleccionar</option>
-            {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
-          </PillSelect>
-        </FormField>
-        <FormField label="Código postal*" error={errors['origen.codigoPostal']}>
-          <PillInput
-            icon={<FileText className="w-4 h-4" />}
-            placeholder="6320"
-            value={data.origen.codigoPostal}
-            onChange={e => onChange('origen', 'codigoPostal', e.target.value)}
-            error={errors['origen.codigoPostal']}
-          />
-        </FormField>
+        ) : (
+          <p className="text-sm text-gray-400">Cargando buscador de direcciones...</p>
+        )}
+        {errors['origen.direccion'] && (
+          <p className="mt-1 text-xs text-red-600">{errors['origen.direccion']}</p>
+        )}
+        {data.origen.ciudad && (
+          <p className="mt-1 text-xs text-emerald-600">📍 {data.origen.ciudad}, {data.origen.provincia}</p>
+        )}
       </div>
 
       <p className="text-lg font-bold text-gray-900 mb-3 mt-5">Destino</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-        <FormField label="Calle*" error={errors['destino.direccion']}>
-          <PillInput
-            icon={<MapPin className="w-4 h-4" />}
-            placeholder="Av. Bartolomé Mitre 245"
-            value={data.destino.direccion}
-            onChange={e => onChange('destino', 'direccion', e.target.value)}
-            error={errors['destino.direccion']}
+      <div className="mb-3">
+        {mapsLoaded ? (
+          <PlacesAutocomplete
+            label="Dirección de destino*"
+            required
+            placeholder="Ej: Puerto de Rosario, Santa Fe"
+            onPlaceSelect={(place) => {
+              onChange('destino', 'direccion', place.direccion);
+              onChange('destino', 'ciudad', place.ciudad);
+              onChange('destino', 'provincia', place.provincia);
+              onChange('destino', 'coordenadas', place.coordenadas);
+            }}
           />
-        </FormField>
-        <FormField label="Ciudad*" error={errors['destino.ciudad']}>
-          <PillInput
-            icon={<Building2 className="w-4 h-4" />}
-            placeholder="Villegas"
-            value={data.destino.ciudad}
-            onChange={e => onChange('destino', 'ciudad', e.target.value)}
-            error={errors['destino.ciudad']}
-          />
-        </FormField>
-        <FormField label="Provincia*" error={errors['destino.provincia']}>
-          <PillSelect
-            icon={<PlusCircle className="w-4 h-4" />}
-            value={data.destino.provincia}
-            onChange={e => onChange('destino', 'provincia', e.target.value)}
-            error={errors['destino.provincia']}
-          >
-            <option value="">Seleccionar</option>
-            {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
-          </PillSelect>
-        </FormField>
-        <FormField label="Código postal*" error={errors['destino.codigoPostal']}>
-          <PillInput
-            icon={<FileText className="w-4 h-4" />}
-            placeholder="6320"
-            value={data.destino.codigoPostal}
-            onChange={e => onChange('destino', 'codigoPostal', e.target.value)}
-            error={errors['destino.codigoPostal']}
-          />
-        </FormField>
+        ) : (
+          <p className="text-sm text-gray-400">Cargando buscador de direcciones...</p>
+        )}
+        {errors['destino.direccion'] && (
+          <p className="mt-1 text-xs text-red-600">{errors['destino.direccion']}</p>
+        )}
+        {data.destino.ciudad && (
+          <p className="mt-1 text-xs text-emerald-600">📍 {data.destino.ciudad}, {data.destino.provincia}</p>
+        )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FormField label="Puerto/Acopio*" error={errors['tipoDestino']}>
@@ -200,9 +166,14 @@ function Step3({ data, onChange, errors }) {
             icon={<Truck className="w-4 h-4" />}
             type="number"
             min="0"
+            max="50"
             placeholder="0"
             value={data.camionesComunes}
-            onChange={e => onChange(null, 'camionesComunes', e.target.value)}
+            onChange={e => {
+              const v = e.target.value.replace(/[^0-9]/g, '');
+              const n = parseInt(v, 10);
+              if (v === '' || (n >= 0 && n <= 50)) onChange(null, 'camionesComunes', v);
+            }}
             error={errors['camionesComunes']}
           />
         </FormField>
@@ -211,9 +182,14 @@ function Step3({ data, onChange, errors }) {
             icon={<Truck className="w-4 h-4" />}
             type="number"
             min="0"
+            max="50"
             placeholder="0"
             value={data.camionesEscalables}
-            onChange={e => onChange(null, 'camionesEscalables', e.target.value)}
+            onChange={e => {
+              const v = e.target.value.replace(/[^0-9]/g, '');
+              const n = parseInt(v, 10);
+              if (v === '' || (n >= 0 && n <= 50)) onChange(null, 'camionesEscalables', v);
+            }}
             error={errors['camionesEscalables']}
           />
         </FormField>
@@ -263,6 +239,16 @@ export const SolicitarViaje = () => {
   const [calculating, setCalculating] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(location.state?.formData ?? EMPTY_FORM);
+  const [mapsLoaded, setMapsLoaded] = useState(!!window.google?.maps);
+
+  useEffect(() => {
+    if (window.google?.maps) return;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,directions`;
+    script.async = true;
+    script.onload = () => setMapsLoaded(true);
+    document.head.appendChild(script);
+  }, []);
 
   const handleChange = (section, field, value) => {
     setErrors(prev => {
@@ -283,14 +269,8 @@ export const SolicitarViaje = () => {
   const validateStep = (s) => {
     const e = {};
     if (s === 1) {
-      if (!formData.origen.direccion) e['origen.direccion'] = 'Campo requerido';
-      if (!formData.origen.ciudad) e['origen.ciudad'] = 'Campo requerido';
-      if (!formData.origen.provincia) e['origen.provincia'] = 'Campo requerido';
-      if (!formData.origen.codigoPostal) e['origen.codigoPostal'] = 'Campo requerido';
-      if (!formData.destino.direccion) e['destino.direccion'] = 'Campo requerido';
-      if (!formData.destino.ciudad) e['destino.ciudad'] = 'Campo requerido';
-      if (!formData.destino.provincia) e['destino.provincia'] = 'Campo requerido';
-      if (!formData.destino.codigoPostal) e['destino.codigoPostal'] = 'Campo requerido';
+      if (!formData.origen.direccion) e['origen.direccion'] = 'Seleccioná una dirección de origen';
+      if (!formData.destino.direccion) e['destino.direccion'] = 'Seleccioná una dirección de destino';
       if (!formData.tipoDestino) e['tipoDestino'] = 'Campo requerido';
     }
     if (s === 2) {
@@ -299,8 +279,14 @@ export const SolicitarViaje = () => {
     }
     if (s === 3) {
       if (!formData.grano) e['grano'] = 'Campo requerido';
-      if (!formData.camionesComunes && !formData.camionesEscalables) {
+      const nComunes = parseInt(formData.camionesComunes || 0);
+      const nEscalables = parseInt(formData.camionesEscalables || 0);
+      if (!nComunes && !nEscalables) {
         e['camionesComunes'] = 'Ingresá al menos un tipo de camión';
+      } else if (nComunes < 0 || nEscalables < 0) {
+        e['camionesComunes'] = 'La cantidad de camiones no puede ser negativa';
+      } else if (nComunes > 50 || nEscalables > 50) {
+        e['camionesComunes'] = 'La cantidad máxima por tipo es 50 camiones';
       }
     }
     return e;
@@ -375,7 +361,9 @@ export const SolicitarViaje = () => {
 
       {/* Desktop header */}
       <div className="hidden lg:flex items-center px-4 py-4 gap-4">
-        <img src={logo} alt="Ruta y Campo" className="w-10 h-10 flex-shrink-0" />
+        <button type="button" onClick={() => navigate('/')} className="focus:outline-none flex-shrink-0">
+          <img src={logo} alt="Ruta y Campo" className="w-10 h-10" />
+        </button>
         <div className="flex-1 flex justify-center">
           <div className="w-full max-w-2xl flex items-center gap-2">
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -408,7 +396,7 @@ export const SolicitarViaje = () => {
             </div>
           )}
 
-          {step === 1 && <Step1 data={formData} onChange={handleChange} errors={errors} />}
+          {step === 1 && <Step1 data={formData} onChange={handleChange} errors={errors} mapsLoaded={mapsLoaded} />}
           {step === 2 && <Step2 data={formData} onChange={handleChange} errors={errors} />}
           {step === 3 && <Step3 data={formData} onChange={handleChange} errors={errors} />}
 

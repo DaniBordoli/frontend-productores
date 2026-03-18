@@ -14,6 +14,7 @@ export const Login = () => {
   });
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [inactiveError, setInactiveError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -24,6 +25,7 @@ export const Login = () => {
     });
     if (name === 'email') setEmailError('');
     if (name === 'password') setPasswordError('');
+    setInactiveError('');
   };
 
   const handleSubmit = async (e) => {
@@ -55,8 +57,12 @@ export const Login = () => {
       await login(formData.email, formData.password);
       navigate('/');
     } catch (err) {
-      setEmailError('Tu correo es inválido, intentalo nuevamente');
-      setPasswordError('Tu contraseña es inválida, intentalo nuevamente');
+      if (err.response?.status === 403) {
+        setInactiveError(err.response.data.message);
+      } else {
+        setEmailError('Tu correo es inválido, intentalo nuevamente');
+        setPasswordError('Tu contraseña es inválida, intentalo nuevamente');
+      }
     } finally {
       setLoading(false);
     }
@@ -85,6 +91,13 @@ export const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-5 pb-4 lg:pb-0">
+
+            {/* Cuenta inactiva */}
+            {inactiveError && (
+              <div className="bg-amber-50 border border-amber-300 text-amber-800 px-4 py-3 rounded-2xl text-sm">
+                {inactiveError}
+              </div>
+            )}
 
             {/* Email */}
             <div className="flex flex-col gap-1">
