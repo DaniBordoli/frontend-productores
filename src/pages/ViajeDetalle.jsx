@@ -114,14 +114,26 @@ export const ViajeDetalle = () => {
   const destCity = cityOf(trip.destino);
   const distanceKm = trip.distancia ? `${trip.distancia} km` : null;
   const requestedTrucks = trip.camionesSolicitados ?? 0;
-  const assignedTrucks = [
-    { _id: '1', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '2', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '3', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '4', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-    { _id: '5', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-    { _id: '6', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-  ]; // TODO: remove mock
+  const camionesComunes = trip.camionesComunes ?? 0;
+  const camionesEscalables = trip.camionesEscalables ?? 0;
+  const assignedTrucks = (trip.camionesAsignados || []).map((c, i) => {
+    const tipo = i < camionesComunes ? 'Común' : i < camionesComunes + camionesEscalables ? 'Escalable' : '—';
+    const choferNombre = c.transportista?.nombre
+      || c.transportista?.razonSocial
+      || (typeof c.transportista === 'string' ? `Chofer #${String(c.transportista).slice(-6).toUpperCase()}` : null);
+    return {
+      _id: c._id,
+      truckId: c.camion?._id?.slice(-6).toUpperCase() || c._id?.slice(-6).toUpperCase(),
+      chofer: { nombre: choferNombre },
+      estado: c.subEstado || 'pendiente',
+      patente: c.camion?.patente || null,
+      tipo,
+      cartaDePorte: c.cartaDePorte || 'pendiente',
+      checkIns: c.checkIns || [],
+      camion: c.camion,
+      transportista: c.transportista,
+    };
+  });
   const canTrack = trip.estado === 'en_curso' && (trip.trackingActivo || trip.rutaCompleta?.length > 0);
 
   // Pricing
@@ -336,9 +348,7 @@ export const ViajeDetalle = () => {
             <div className="md:hidden bg-white rounded-2xl border border-[#DEDEDE] overflow-hidden divide-y divide-[#DEDEDE]">
               {assignedTrucks.map((row, i) => {
                 const choferName = row.chofer?.nombre || row.choferNombre || 'Sin chofer';
-                const patente = row.patente ||
-                  (row.camionOptions?.find((c) => c._id === row.camionId)?.patente) ||
-                  'Patente a confirmar';
+                const patente = row.patente || 'Patente a confirmar';
                 const truckId = row.truckId || row._id?.slice(-6).toUpperCase() || `C-${i + 1}`;
                 return (
                   <div
@@ -394,15 +404,10 @@ export const ViajeDetalle = () => {
                       <StatusBadge status={row.estado || row.status || 'pendiente'} />
                     </td>
                     <td className="px-6 py-4 text-sm text-[#363636]">
-                      {row.chofer?.nombre ||
-                        row.choferNombre ||
-                        (row.choferOptions?.find((c) => c._id === row.choferId)?.name) ||
-                        '—'}
+                      {row.chofer?.nombre || '—'}
                     </td>
                     <td className="px-6 py-4 text-sm text-[#363636]">
-                      {row.patente ||
-                        (row.camionOptions?.find((c) => c._id === row.camionId)?.patente) ||
-                        '—'}
+                      {row.patente || '—'}
                     </td>
                     <td className="px-6 py-4">
                       <StatusBadge status={row.cartaDePorte || 'pendiente'} />

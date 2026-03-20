@@ -21,9 +21,12 @@ const STATUS_VARIANT_MAP = {
   propuesta: 'yellow',
 };
 
+const capitalize = (str) =>
+  str ? str.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase()) : '—';
+
 export const StatusBadge = ({ status, variant, label }) => {
   const resolvedVariant = variant ?? STATUS_VARIANT_MAP[status] ?? 'blue';
-  const resolvedLabel = label ?? TRIP_STATUS_LABELS[status] ?? status ?? '—';
+  const resolvedLabel = label ?? TRIP_STATUS_LABELS[status] ?? (status ? capitalize(status) : '—');
   const styles = VARIANT_STYLES[resolvedVariant];
 
   return (
