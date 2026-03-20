@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
+import PinLocationIcon from '../assets/PinLocation.svg';
 
 const PlacesAutocomplete = ({ label, value, onPlaceSelect, required = false, placeholder = 'Buscar dirección...' }) => {
   const inputRef = useRef(null);
@@ -62,15 +62,17 @@ const PlacesAutocomplete = ({ label, value, onPlaceSelect, required = false, pla
           {label} {required && '*'}
         </label>
       )}
-      <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+      <div className="flex items-center gap-3 bg-white rounded-full pl-[6px] pr-4 py-[6px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
+        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#F6F6F6] flex-shrink-0">
+          <img src={PinLocationIcon} alt="Location" className="w-4 h-4" />
+        </div>
         <input
           ref={inputRef}
           type="text"
           defaultValue={value}
           required={required}
           placeholder={placeholder}
-          className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { X, LogOut } from 'lucide-react';
+import { X, LogOut, ChevronRight } from 'lucide-react';
 import UserSidebarIcon from '../assets/UserSidebar.svg';
 import SidebarIcon from '../assets/SidebarIcon.svg';
 import logo from '../assets/Logo.svg';
@@ -11,7 +11,6 @@ import rutaycampoLogo from '../assets/rutaycampoLogo.svg';
 const menuItems = [
   { path: '/', icon: 'dashboard', label: 'Dashboard' },
   { path: '/viajes', icon: 'viajes', label: 'Viajes' },
-  { path: '/perfil', icon: 'perfil', label: 'Mi Perfil' },
 ];
 
 export const Layout = ({ children }) => {
@@ -58,9 +57,9 @@ export const Layout = ({ children }) => {
     <div className="min-h-screen bg-[#F6F6F6]">
       {/* Sidebar */}
       <aside
-        className={`fixed top-[72px] md:top-0 left-0 z-40 h-[calc(100vh-72px)] md:h-screen transition-transform ${
+        className={`fixed top-[72px] md:top-0 left-0 z-[60] h-[calc(100vh-72px)] md:h-screen transition-transform ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } bg-white border-r border-gray-200 w-64`}
+        } bg-white border-r border-gray-200 w-[85%] md:w-64`}
       >
         <div className="h-full flex flex-col">
           {/* Logo - desktop only */}
@@ -91,17 +90,23 @@ export const Layout = ({ children }) => {
 
           {/* User section */}
           <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center gap-3 mb-3">
+            <Link
+              to="/perfil"
+              className="flex items-center gap-3 mb-3 group cursor-pointer"
+            >
               <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                 <img src={UserSidebarIcon} alt="Usuario" className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.nombre || user?.email}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.nombre || user?.email}
+                  </p>
+                  <ChevronRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
                 <p className="text-xs text-gray-500 capitalize">{user?.rol}</p>
               </div>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg transition-colors"
@@ -125,8 +130,8 @@ export const Layout = ({ children }) => {
             >
               {/* Mobile: X cuando abierto, Menu cuando cerrado */}
               {sidebarOpen
-                ? <X className="w-5 h-5 text-gray-600 md:hidden" />
-                : <img src={MenuIcon} alt="Abrir menú" className="w-5 h-5 md:hidden" />
+                ? <X className="w-6 h-6 text-gray-600 md:hidden" />
+                : <img src={MenuIcon} alt="Abrir menú" className="w-6 h-6 md:hidden" />
               }
               {/* Desktop: siempre SidebarIcon */}
               <img src={SidebarIcon} alt="Toggle sidebar" className="w-5 h-5 hidden md:block" />

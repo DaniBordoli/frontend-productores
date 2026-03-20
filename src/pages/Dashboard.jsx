@@ -107,10 +107,10 @@ export const Dashboard = () => {
   const completedPct = stats.total > 0 ? Math.round((stats.finalizados / stats.total) * 100) : 0;
 
   const donutSegments = [
-    { label: 'Finalizados', value: stats.finalizados, color: '#5EAF74' },
-    { label: 'En curso', value: stats.enCurso, color: '#8CD19E' },
-    { label: 'En asignación', value: stats.enAsignacion, color: '#E6A817' },
-    { label: 'Solicitados', value: stats.solicitados, color: '#F6D35B' },
+    { label: 'Finalizados', value: stats.finalizados, color: stats.finalizados > 0 ? '#45845C' : '#DEDEDE' },
+    { label: 'En curso', value: stats.enCurso, color: stats.enCurso > 0 ? '#BFDBC5' : '#DEDEDE' },
+    { label: 'En asignación', value: stats.enAsignacion, color: stats.enAsignacion > 0 ? '#FFD819' : '#DEDEDE' },
+    { label: 'Solicitados', value: stats.solicitados, color: stats.solicitados > 0 ? '#FFEE99' : '#DEDEDE' },
   ];
 
   if (loading) {
@@ -137,16 +137,18 @@ export const Dashboard = () => {
       </div>
 
       {/* ─── 1. Revisar urgente ──────────────────────────────── */}
-      <section className="md:bg-white md:rounded-[16px] md:shadow-lg md:p-6">
-        <h2 className="text-[22px] font-semibold text-gray-900 mb-4">Revisar urgente</h2>
+      <section className="-mx-4 md:mx-0">
+        <h2 className="text-[22px] font-semibold text-gray-900 mb-4 px-4 md:px-0 md:hidden">Revisar urgente</h2>
+        <div className="bg-white rounded-[16px] p-6 mx-4 md:mx-0 md:rounded-[16px] md:p-6" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
+          <h2 className="hidden md:block text-[22px] font-semibold text-gray-900 mb-4">Revisar urgente</h2>
 
         {viajesUrgentes.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-12">
             <div className="w-28 h-28 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 mb-5">
               <Package className="w-10 h-10" />
             </div>
-            <h3 className="text-base font-medium text-gray-900 mb-1">No hay viajes urgentes</h3>
-            <p className="text-sm text-gray-500">Todos los viajes están en orden</p>
+            <h3 className="text-base font-medium text-gray-900 mb-1">No hay casos urgentes</h3>
+            <p className="text-sm text-gray-500">Cuando haya viajes que requieran atención inmediata, aparecerán acá</p>
           </div>
         ) : (
           <>
@@ -206,11 +208,14 @@ export const Dashboard = () => {
             </div>
           </>
         )}
+        </div>
       </section>
 
       {/* ─── 2. Viajes en curso ──────────────────────────────── */}
-      <section className="md:bg-white md:rounded-[16px] md:shadow-lg md:p-6">
-        <h2 className="text-[22px] font-semibold text-gray-900 mb-4">Viajes en curso</h2>
+      <section className="-mx-4 md:mx-0">
+        <h2 className="text-[22px] font-semibold text-gray-900 mb-4 px-4 md:px-0 md:hidden">Viajes en curso</h2>
+        <div className="bg-white rounded-[16px] p-6 mx-4 md:mx-0 md:rounded-[16px] md:p-6" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
+          <h2 className="hidden md:block text-[22px] font-semibold text-gray-900 mb-4">Viajes en curso</h2>
 
         {viajesEnCurso.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-12">
@@ -305,26 +310,29 @@ export const Dashboard = () => {
           </div>
           </>
         )}
+        </div>
       </section>
 
       {/* ─── 3. Pendientes + Estado de viajes ────────────────── */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-6 -mx-4 md:mx-0">
         {/* Pendientes de aprobación — scrolleable */}
-        <section className="flex-1 md:bg-white md:rounded-[16px] md:shadow-lg md:p-6 flex flex-col min-h-0">
-          <div className="flex items-center gap-3 mb-4 shrink-0">
-            <h2 className="text-[22px] font-semibold text-gray-900">Pendientes de aprobación</h2>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#F6F6F6] text-[#888888]">
-              {pendientes.length} viajes
-            </span>
-          </div>
+        <section className="flex-1 flex flex-col min-h-0">
+          <h2 className="text-[22px] font-semibold text-gray-900 mb-4 px-4 md:px-0 md:hidden">Pendientes de aprobación</h2>
+          <div className="bg-white rounded-[16px] p-6 mx-4 md:mx-0 md:rounded-[16px] md:p-6 flex flex-col min-h-0" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
+            <div className="hidden md:flex items-center gap-3 mb-4 shrink-0">
+              <h2 className="text-[22px] font-semibold text-gray-900">Pendientes de aprobación</h2>
+              <span className="inline-flex items-center px-4 py-2 rounded-[16px] text-base font-regular bg-[#F6F6F6] text-[#888888]">
+                {pendientes.length} viajes
+              </span>
+            </div>
 
           {pendientes.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center py-12">
               <div className="w-28 h-28 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 mb-5">
                 <Package className="w-10 h-10" />
               </div>
-              <h3 className="text-base font-medium text-gray-900 mb-1">No hay viajes pendientes</h3>
-              <p className="text-sm text-gray-500">Cuando tengas viajes pendientes de aprobación, aparecerán acá</p>
+              <h3 className="text-base font-medium text-gray-900 mb-1">No hiciste nuevas solicitudes</h3>
+              <p className="text-sm text-gray-500">Tus solicitudes en revisión aparecerán acá</p>
             </div>
           ) : (
             <>
@@ -360,20 +368,23 @@ export const Dashboard = () => {
               </div>
             </>
           )}
+          </div>
         </section>
 
         {/* Estado de viajes — replica exacta del dashboard */}
-        <section className="flex-1 md:bg-white md:rounded-[16px] md:shadow-lg md:p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold text-gray-900">Estado de viajes</h2>
-            <div className="hidden md:flex items-center bg-[#F6F6F6] rounded-[16px] px-4 py-2">
-              <img src={ArrowUpCircle} alt="Completado" className="w-5 h-5 mr-2" />
-              <span className="text-[#888888]">{completedPct}% completados</span>
+        <section className="flex-1">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4 px-4 md:px-0 md:hidden">Estado de viajes</h2>
+          <div className="bg-white rounded-[16px] p-6 mx-4 md:mx-0 md:rounded-[16px] md:p-6" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
+            <div className="hidden md:flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900">Estado de viajes</h2>
+              <div className="flex items-center bg-[#F6F6F6] rounded-[16px] px-4 py-2">
+                <img src={ArrowUpCircle} alt="Completado" className="w-5 h-5 mr-2" />
+                <span className="text-[#888888]">{completedPct}% completados</span>
+              </div>
             </div>
-          </div>
 
           {/* Mobile: donut centered + 2x2 legend */}
-          <div className="md:hidden bg-white rounded-[16px] shadow-sm border border-[#E8E8E8] pb-[50px]">
+          <div className="md:hidden pb-[50px]">
             <div className="flex justify-center py-6">
               <div className="relative">
                 <DonutChart segments={donutSegments} size={220} stroke={34} />
@@ -385,11 +396,11 @@ export const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4 px-[45px]">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4 px-6">
               {donutSegments.map((seg) => (
                 <div key={seg.label} className="flex items-center gap-2">
                   <div className="w-3.5 h-3.5 rounded-full shrink-0" style={{ background: seg.color }} />
-                  <span className="text-sm text-gray-700">{seg.label}: {seg.value}</span>
+                  <span className="text-sm text-gray-700 whitespace-nowrap">{seg.label}: {seg.value}</span>
                 </div>
               ))}
             </div>
@@ -414,6 +425,7 @@ export const Dashboard = () => {
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </section>
       </div>

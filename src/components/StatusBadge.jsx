@@ -40,7 +40,7 @@ export const StatusBadge = ({ status, variant, label }) => {
         paddingRight: 12,
         borderRadius: 9999,
         fontSize: 13,
-        fontWeight: 500,
+        fontWeight: 400,
         lineHeight: '20px',
         whiteSpace: 'nowrap',
         background: styles.background,

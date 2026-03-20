@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { X, ArrowLeft, PlusCircle, Calendar, Clock, Truck, AlignLeft, Info } from 'lucide-react';
+import { X, ArrowLeft, PlusCircle, Truck, AlignLeft } from 'lucide-react';
 import logo from '../assets/rutaycampoLogo.svg';
 import PlacesAutocomplete from '../components/PlacesAutocomplete';
+import DatePicker from '../components/DatePicker';
+import PlusCircleIcon from '../assets/PlusCircle.svg';
+import TruckIcon from '../assets/Truck.svg';
+import MessageFilledIcon from '../assets/MessageFilled.svg';
+import ClockFilledIcon from '../assets/ClockFilled.svg';
+import InfoFilledIcon from '../assets/InfoFilled.svg';
+import { MobileNavbar } from '../components/MobileNavbar';
 
 import { Button, PillInput, PillSelect, FormField } from '../components/ui';
 
@@ -19,9 +26,9 @@ const CARGO_TYPES = [
 ];
 
 const HORA_OPTIONS = [
-  '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
-  '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
-  '18:00', '19:00', '20:00',
+  '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
+  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00',
 ];
 
 
@@ -30,7 +37,7 @@ function Step1({ data, onChange, errors, mapsLoaded }) {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-900">Completá el recorrido del viaje</h2>
-      <p className="text-sm text-gray-500 mt-1 mb-6">Indicanos el origen y destino de tu pedido.</p>
+      <p className="text-md text-gray-500 mt-1 mb-6">Indicanos el origen y destino de tu pedido.</p>
 
       <p className="text-lg font-bold text-gray-900 mb-3">Origen</p>
       <div className="mb-3">
@@ -84,7 +91,7 @@ function Step1({ data, onChange, errors, mapsLoaded }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FormField label="Puerto/Acopio*" error={errors['tipoDestino']}>
           <PillSelect
-            icon={<PlusCircle className="w-4 h-4" />}
+            icon={<img src={PlusCircleIcon} alt="Plus" className="w-4 h-4" />}
             value={data.tipoDestino}
             onChange={e => onChange(null, 'tipoDestino', e.target.value)}
             error={errors['tipoDestino']}
@@ -107,17 +114,18 @@ function Step2({ data, onChange, errors }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FormField label="Fecha*" error={errors['fecha']}>
-          <PillInput
-            icon={<Calendar className="w-4 h-4" />}
-            type="date"
+          <DatePicker
+            label=""
+            name="fecha"
             value={data.fecha}
             onChange={e => onChange(null, 'fecha', e.target.value)}
-            error={errors['fecha']}
+            placeholder="Seleccionar fecha"
+            required
           />
         </FormField>
         <FormField label="Hora*" error={errors['hora']}>
           <PillSelect
-            icon={<Clock className="w-4 h-4" />}
+            icon={<img src={ClockFilledIcon} alt="Clock" className="w-4 h-4" />}
             value={data.hora}
             onChange={e => onChange(null, 'hora', e.target.value)}
             error={errors['hora']}
@@ -139,16 +147,16 @@ function Step3({ data, onChange, errors }) {
       <p className="text-sm text-gray-500 mt-1 mb-5">Indicanos el tipo de grano y cantidad de camiones</p>
 
       {/* Info banner */}
-      <div className="flex items-center gap-2 bg-blue-50 text-blue-700 text-sm px-4 py-3 rounded-xl mb-5">
-        <Info className="w-4 h-4 flex-shrink-0" />
+      <div className="flex items-center gap-2 bg-[#EDF2F8] text-[#3590F3] text-sm px-4 py-3 rounded-xl mb-5">
+        <img src={InfoFilledIcon} alt="Info" className="w-4 h-4 flex-shrink-0" />
         <span>El valor del viaje se basará en la cantidad de camiones que solicites.</span>
       </div>
 
       {/* Grano - full width */}
       <div className="mb-3">
-        <FormField label="Grano*" error={errors['grano']}>
+        <FormField label="Tipo de carga*" error={errors['grano']}>
           <PillSelect
-            icon={<PlusCircle className="w-4 h-4" />}
+            icon={<img src={PlusCircleIcon} alt="Plus" className="w-4 h-4" />}
             value={data.grano}
             onChange={e => onChange(null, 'grano', e.target.value)}
             error={errors['grano']}
@@ -163,7 +171,7 @@ function Step3({ data, onChange, errors }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
         <FormField label="Camiones comunes*" error={errors['camionesComunes']}>
           <PillInput
-            icon={<Truck className="w-4 h-4" />}
+            icon={<img src={TruckIcon} alt="Truck" className="w-4 h-4" />}
             type="number"
             min="0"
             max="50"
@@ -179,7 +187,7 @@ function Step3({ data, onChange, errors }) {
         </FormField>
         <FormField label="Camiones escalables*" error={errors['camionesEscalables']}>
           <PillInput
-            icon={<Truck className="w-4 h-4" />}
+            icon={<img src={TruckIcon} alt="Truck" className="w-4 h-4" />}
             type="number"
             min="0"
             max="50"
@@ -199,7 +207,7 @@ function Step3({ data, onChange, errors }) {
       <FormField label="Notas adicionales (opcional)">
         <div className="flex items-start gap-3 bg-white rounded-2xl pl-[6px] pr-4 pt-[6px] pb-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
           <div className="flex items-center justify-center w-9 h-9 rounded-full flex-shrink-0 bg-[#F6F6F6] mt-0.5">
-            <AlignLeft className="w-4 h-4" style={{ color: '#888888' }} />
+            <img src={MessageFilledIcon} alt="Message" className="w-4 h-4" />
           </div>
           <div className="flex-1">
             <textarea
@@ -325,6 +333,9 @@ export const SolicitarViaje = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      {/* Mobile Navbar */}
+      <MobileNavbar />
+      
       {/* Mobile header */}
       <div className="lg:hidden">
         <div className="flex items-center gap-2 px-4 pt-4 pb-2">

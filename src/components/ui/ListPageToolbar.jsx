@@ -15,7 +15,7 @@ export const ListPageToolbar = ({
   children,
 }) => (
   <div className="flex flex-wrap items-center gap-3 mb-4 w-full">
-    <div className="flex-1 md:flex-none md:w-[319px]">
+    <div className="flex-1 min-w-0 md:flex-none md:w-[319px]">
       <SearchInput
         value={searchTerm}
         onChange={onSearchChange}

@@ -48,7 +48,7 @@ export const TripSummaryCard = ({ trip, onVerDetalle }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-[#DEDEDE] overflow-hidden">
+    <div className="bg-white rounded-2xl border border-[#DEDEDE] overflow-hidden" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
 
       {/* ── Recorrido ──────────────────────────────── */}
       <div className="px-4 pt-4 pb-4">
@@ -64,7 +64,7 @@ export const TripSummaryCard = ({ trip, onVerDetalle }) => {
         <div className="flex gap-3">
           {/* Icon + connector column */}
           <div className="flex flex-col items-center flex-shrink-0">
-            <div className="w-10 h-10 rounded-full bg-[#F1F8F3] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[#F1F8F3] flex items-center justify-center md:w-10 md:h-10" style={{ width: 55, height: 55 }}>
               <ElipseIcon />
             </div>
             <div className="flex-1 flex flex-col items-center justify-center gap-1 py-1 min-h-[24px]">
@@ -72,7 +72,7 @@ export const TripSummaryCard = ({ trip, onVerDetalle }) => {
               <div className="w-1 h-1.5 rounded-full bg-[#DEDEDE]" />
               <div className="w-1 h-1.5 rounded-full bg-[#DEDEDE]" />
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#F1F8F3] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[#F1F8F3] flex items-center justify-center md:w-10 md:h-10" style={{ width: 55, height: 55 }}>
               <ElipseIcon />
             </div>
           </div>
@@ -126,7 +126,8 @@ export const TripSummaryCard = ({ trip, onVerDetalle }) => {
       <div className="px-4 pb-4">
         <button
           onClick={handleVerDetalle}
-          className="w-full py-3.5 text-sm font-medium text-[#363636] rounded-2xl bg-white hover:bg-gray-50 transition-colors border border-[#DEDEDE]"
+          className="w-full py-3.5 text-sm font-medium text-[#363636] bg-white hover:bg-gray-50 transition-colors border border-[#DEDEDE]"
+          style={{ borderRadius: 80, boxShadow: '0px 1px 34px 0px #10182814' }}
         >
           Ver detalle
         </button>
