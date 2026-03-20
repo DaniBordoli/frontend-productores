@@ -76,6 +76,7 @@ export const ViajeDetalle = () => {
   const [loading, setLoading] = useState(true);
   const [showTracking, setShowTracking] = useState(false);
   const [selectedTruckIdx, setSelectedTruckIdx] = useState(null);
+  const [showTripDetail, setShowTripDetail] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const { isConnected, lastUpdate } = useWebSocket(id);
   const trucksRef = useRef(null);
@@ -114,14 +115,7 @@ export const ViajeDetalle = () => {
   const destCity = cityOf(trip.destino);
   const distanceKm = trip.distancia ? `${trip.distancia} km` : null;
   const requestedTrucks = trip.camionesSolicitados ?? 0;
-  const assignedTrucks = [
-    { _id: '1', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '2', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '3', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'común' },
-    { _id: '4', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-    { _id: '5', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-    { _id: '6', truckId: 'HARCODE-1234', chofer: { nombre: 'Sin chofer' }, estado: 'pendiente', patente: 'Patente a confirmar', cartaDePorte: 'pendiente', tipo: 'escalable' },
-  ]; // TODO: remove mock
+  const assignedTrucks = []; // Empty array - show empty state
   const canTrack = trip.estado === 'en_curso' && (trip.trackingActivo || trip.rutaCompleta?.length > 0);
 
   // Pricing
@@ -155,7 +149,7 @@ export const ViajeDetalle = () => {
         )}
         <TripSummaryCard
           trip={trip}
-          onVerDetalle={() => trucksRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          onVerDetalle={() => setShowTripDetail(true)}
         />
       </div>
 
@@ -280,14 +274,14 @@ export const ViajeDetalle = () => {
       )}
 
       {/* Detalle de camiones */}
-      <div ref={trucksRef} className="flex flex-col gap-3 md:gap-0 md:bg-white md:rounded-2xl md:shadow md:border md:border-[#DEDEDE] md:overflow-hidden">
+      <div ref={trucksRef} className="flex flex-col gap-3 md:gap-0 md:bg-white md:rounded-2xl md:border md:border-[#DEDEDE] md:overflow-hidden">
 
         {/* Title + progress — floating on mobile, inside card on desktop */}
         <div className="md:px-6 md:pt-5 md:pb-4">
           <h2 className="text-base font-semibold text-gray-900">Detalle de camiones</h2>
           {assignedTrucks.length > 0 && (() => {
             const covered = assignedTrucks.filter(
-              (r) => r.estado && r.estado !== 'pendiente'
+              (r) => r.estado && r.estado !== 'Pendiente'
             ).length;
             const total = assignedTrucks.length;
             const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
@@ -297,14 +291,14 @@ export const ViajeDetalle = () => {
                 style={{ background: '#F1F8F3', border: '1px solid #BFDBC5', borderRadius: 16 }}
               >
                 {/* Mobile: stacked */}
-                <div className="md:hidden mb-2">
-                  <p className="text-sm font-semibold" style={{ color: '#45845C' }}>Progreso de asignación</p>
-                  <p className="text-sm font-medium" style={{ color: '#45845C' }}>{covered} de {total} camiones cubiertos</p>
+                <div className="md:hidden mb-4">
+                  <p className="text-sm font-medium" style={{ color: '#45845C' }}>Progreso de asignación</p>
+                  <p className="text-sm font-regular mt-2" style={{ color: '#45845C' }}>{covered} de {total} camiones cubiertos</p>
                 </div>
                 {/* Desktop: inline */}
                 <div className="hidden md:flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold" style={{ color: '#45845C' }}>Progreso de asignación</span>
-                  <span className="text-sm font-medium" style={{ color: '#45845C' }}>{covered} de {total} camiones cubiertos</span>
+                  <span className="text-sm font-medium" style={{ color: '#45845C' }}>Progreso de asignación</span>
+                  <span className="text-sm font-regular" style={{ color: '#45845C' }}>{covered} de {total} camiones cubiertos</span>
                 </div>
                 <div className="w-full h-2 rounded-full" style={{ background: '#DEEDE0' }}>
                   <div
@@ -323,11 +317,11 @@ export const ViajeDetalle = () => {
 
         {/* Truck list — own white card on mobile, seamless on desktop */}
         {assignedTrucks.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#DEDEDE] md:border-0 md:rounded-none flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="bg-white rounded-2xl border border-[#DEDEDE] md:border-0 md:rounded-none flex flex-col items-center justify-center py-16 px-6 text-center shadow-[0px_1px_34px_0px_rgba(16,24,40,0.08)] md:shadow-none">
             <EmptyIllustration />
             <p className="mt-5 text-base font-semibold text-gray-700">Aún no hay datos para mostrar</p>
             <p className="mt-1 text-sm text-gray-400">
-              Cuando se confirmen las asignaciones, verás el detalle de cada camión aquí
+              Cuando confirmes las tarifas, podrás asignar camiones y choferes
             </p>
           </div>
         ) : (
@@ -354,7 +348,7 @@ export const ViajeDetalle = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-semibold text-[#363636]">{choferName}</span>
-                        <StatusBadge status={row.estado || row.status || 'pendiente'} />
+                        <StatusBadge status={row.estado || row.status || 'Pendiente'} />
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {`#${truckId}`}
@@ -391,7 +385,7 @@ export const ViajeDetalle = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-[#363636]">{row.tipo || '—'}</td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={row.estado || row.status || 'pendiente'} />
+                      <StatusBadge status={row.estado || row.status || 'Pendiente'} />
                     </td>
                     <td className="px-6 py-4 text-sm text-[#363636]">
                       {row.chofer?.nombre ||
@@ -405,7 +399,7 @@ export const ViajeDetalle = () => {
                         '—'}
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={row.cartaDePorte || 'pendiente'} />
+                      <StatusBadge status={row.cartaDePorte || 'Pendiente'} />
                     </td>
                     <td className="px-6 py-4">
                       <Button variant="outline" size="sm" disabled>
@@ -425,13 +419,20 @@ export const ViajeDetalle = () => {
         )}
       </div>
 
-      {/* Notas */}
       {/* Trip detail modal (desktop) */}
       <TripDetailModal
         isOpen={showDetailModal}
         onClose={() => setShowDetailModal(false)}
         trip={trip}
       />
+
+      {/* Trip detail sheet (mobile - Ver detalle button) */}
+      {showTripDetail && (
+        <TruckDetailSheet
+          trip={trip}
+          onClose={() => setShowTripDetail(false)}
+        />
+      )}
 
       {selectedTruckIdx !== null && (
         <TruckDetailSheet
@@ -442,14 +443,6 @@ export const ViajeDetalle = () => {
           onPrev={() => setSelectedTruckIdx((i) => Math.max(0, i - 1))}
           onNext={() => setSelectedTruckIdx((i) => Math.min(assignedTrucks.length - 1, i + 1))}
         />
-      )}
-
-      {/* Notas */}
-      {trip.notas && (
-        <div className="bg-white rounded-2xl shadow border border-[#DEDEDE] p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-3">Notas</h2>
-          <p className="text-sm text-gray-600 whitespace-pre-wrap">{trip.notas}</p>
-        </div>
       )}
     </div>
   );

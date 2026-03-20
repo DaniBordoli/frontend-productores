@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import logo from '../assets/rutaycampoLogo.svg';
+import { MobileNavbar } from '../components/MobileNavbar';
 
 const STEPS = [
   {
@@ -25,6 +26,9 @@ export const SolicitarViajeIntro = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-300 lg:bg-white lg:flex-row lg:items-center lg:justify-center lg:p-8">
+      {/* Mobile Navbar */}
+      <MobileNavbar />
+      
       <div className="flex flex-col flex-1 w-full lg:flex-row lg:flex-none lg:max-w-6xl lg:items-center lg:gap-14 xl:gap-20">
 
         {/* Left — placeholder image */}
@@ -38,37 +42,36 @@ export const SolicitarViajeIntro = () => {
         {/* Right — content card */}
         <div className="relative mt-auto lg:mt-0 lg:flex-none w-full lg:max-w-lg lg:mx-0 bg-white rounded-t-[24px] lg:rounded-none px-4 py-8 lg:px-0 lg:py-0">
 
-          {/* Close button */}
+          {/* Close button - desktop only */}
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute top-4 right-4 lg:top-0 lg:-right-2 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors focus:outline-none"
+            className="hidden lg:flex absolute -top-2 -right-12 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm items-center justify-center hover:bg-gray-50 transition-colors focus:outline-none z-10"
             aria-label="Cerrar"
           >
             <X className="w-4 h-4 text-gray-600" />
           </button>
 
-          {/* Logo + heading */}
+          {/* Steps - mobile: horizontal scroll */}
           <div className="mb-8 lg:mb-10">
             <img src={logo} alt="Ruta y Campo" className="hidden lg:block w-14 h-14 mb-6" />
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">¡Creemos tu pedido!</h1>
+            <h1 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-2">¡Creemos tu pedido!</h1>
             <p className="text-sm lg:text-base text-gray-500">
               En solo 3 pasos podés mover tu carga de forma segura y eficiente.
             </p>
           </div>
 
           {/* Steps - mobile: horizontal scroll */}
-          <div className="flex overflow-x-auto gap-3 snap-x snap-mandatory -mx-4 px-4 pb-3 mb-8 lg:hidden scrollbar-none">
+          <div className="flex overflow-x-auto snap-x snap-mandatory lg:hidden scrollbar-none" style={{ padding: '2rem 1rem' }}>
             {STEPS.map(({ n, title, desc }) => (
-              <div
-                key={n}
-                className="flex-shrink-0 w-[72vw] snap-start p-4 rounded-2xl border border-gray-100 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
-              >
-                <div className="w-10 h-10 rounded-full bg-[#45845C] flex items-center justify-center mb-4">
-                  <span className="text-white text-sm font-semibold">{n}</span>
+              <div key={n} className="flex-shrink-0 snap-start" style={{ padding: '0 1rem' }}>
+                <div className="w-[72vw] p-4 rounded-2xl border border-gray-100 bg-white" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
+                  <div className="w-10 h-10 rounded-full bg-[#45845C] flex items-center justify-center mb-4">
+                    <span className="text-white text-sm font-semibold">{n}</span>
+                  </div>
+                  <p className="text-base font-medium text-gray-900 mb-2">{title}</p>
+                  <p className="text-sm font-normal" style={{ color: '#7A7A7A' }}>{desc}</p>
                 </div>
-                <p className="text-base font-medium text-gray-900 mb-2">{title}</p>
-                <p className="text-sm font-normal" style={{ color: '#7A7A7A' }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -91,14 +94,25 @@ export const SolicitarViajeIntro = () => {
             ))}
           </div>
 
-          {/* CTA */}
-          <button
-            type="button"
-            onClick={() => navigate('/solicitar-viaje/form')}
-            className="w-full bg-gradient-to-r from-[#37784C] to-[#5F9C73] hover:opacity-90 active:opacity-95 text-white py-3 lg:py-4 rounded-full text-sm lg:text-base font-semibold tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-          >
-            Comenzar
-          </button>
+          {/* CTA buttons */}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="w-[25%] lg:hidden bg-white border border-[#DEDEDE] hover:bg-gray-50 active:opacity-95 text-gray-900 py-3 lg:py-4 rounded-full text-sm lg:text-base font-medium tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}
+            >
+              Atrás
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/solicitar-viaje/form')}
+              className="w-[75%] lg:w-full bg-gradient-to-r from-[#37784C] to-[#5F9C73] hover:opacity-90 active:opacity-95 text-white py-3 lg:py-4 rounded-full text-sm lg:text-base font-medium tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}
+            >
+              Comenzar
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -23,7 +23,9 @@ const STATUS_VARIANT_MAP = {
 
 export const StatusBadge = ({ status, variant, label }) => {
   const resolvedVariant = variant ?? STATUS_VARIANT_MAP[status] ?? 'blue';
-  const resolvedLabel = label ?? TRIP_STATUS_LABELS[status] ?? status ?? '—';
+  const rawLabel = label ?? TRIP_STATUS_LABELS[status] ?? status ?? '—';
+  // Capitalize first letter
+  const resolvedLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1).toLowerCase();
   const styles = VARIANT_STYLES[resolvedVariant];
 
   return (
@@ -37,7 +39,7 @@ export const StatusBadge = ({ status, variant, label }) => {
         paddingRight: 12,
         borderRadius: 9999,
         fontSize: 13,
-        fontWeight: 500,
+        fontWeight: 400,
         lineHeight: '20px',
         whiteSpace: 'nowrap',
         background: styles.background,

@@ -3,11 +3,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/rutaycampoLogo.svg';
+import checkCircleIcon from '../assets/CheckCircleGradient.svg';
 
 export const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -195,13 +197,19 @@ export const Login = () => {
 
             {/* Remember me + forgot password */}
             <div className="flex items-center justify-between pt-1">
-              <label className="inline-flex items-center gap-2 text-xs lg:text-sm text-gray-600 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
-                />
-                <span>Recuérdame</span>
-              </label>
+              <div
+                className="inline-flex items-center gap-2 text-xs lg:text-sm cursor-pointer select-none"
+                onClick={() => setRememberMe(!rememberMe)}
+              >
+                <div className="relative w-4 h-4 lg:w-5 lg:h-5 flex items-center justify-center flex-shrink-0">
+                  {rememberMe ? (
+                    <img src={checkCircleIcon} alt="Marcado" className="w-4 h-4 lg:w-5 lg:h-5" />
+                  ) : (
+                    <div className="w-4 h-4 lg:w-5 lg:h-5 rounded-full border-2 border-gray-300"></div>
+                  )}
+                </div>
+                <span className="text-gray-600">Recuérdame</span>
+              </div>
               <Link
                 to="/forgot-password"
                 className="text-xs lg:text-sm font-medium text-[#45845C] underline hover:text-[#45845C] transition-colors"

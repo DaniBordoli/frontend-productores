@@ -1,7 +1,12 @@
 import { useState } from 'react';
-import { Eye, EyeOff, User, Phone, Mail, Lock, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { PillInput } from '../components/ui/PillInput';
+import LockIcon from '../assets/Lock.svg';
+import UserIcon from '../assets/User.svg';
+import PhoneIcon from '../assets/PhoneCall.svg';
+import MailIcon from '../assets/MailFilled.svg';
 
 export const MiPerfil = () => {
   const { user, updateUser } = useAuth();
@@ -112,9 +117,9 @@ export const MiPerfil = () => {
       </div>
 
       {/* Avatar + info */}
-      <div className="bg-white rounded-2xl shadow-sm border border-[#DEDEDE] p-6 flex items-center gap-4">
+      <div className="bg-white rounded-2xl p-6 flex items-center gap-4" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
         <div className="w-16 h-16 rounded-full bg-[#DEEDE0] flex items-center justify-center flex-shrink-0">
-          <User className="w-8 h-8 text-[#45845C]" />
+          <img src={UserIcon} alt="User" className="w-8 h-8" style={{ filter: 'brightness(0) saturate(100%) invert(41%) sepia(15%) saturate(1014%) hue-rotate(93deg) brightness(96%) contrast(88%)' }} />
         </div>
         <div>
           <p className="text-lg font-semibold text-gray-900">{user?.nombre || '—'}</p>
@@ -126,7 +131,7 @@ export const MiPerfil = () => {
       </div>
 
       {/* Datos personales */}
-      <div className="bg-white rounded-2xl shadow-sm border border-[#DEDEDE] p-6">
+      <div className="bg-white rounded-2xl p-6" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
         <h2 className="text-base font-semibold text-gray-900 mb-5">Datos personales</h2>
 
         <form onSubmit={handleProfileSubmit} className="space-y-4">
@@ -135,7 +140,7 @@ export const MiPerfil = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
             <div className="flex items-center gap-3 bg-[#F6F6F6] rounded-full px-4 py-3">
-              <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <img src={MailIcon} alt="Mail" className="w-4 h-4 flex-shrink-0" />
               <span className="text-sm text-gray-500">{user?.email}</span>
             </div>
           </div>
@@ -145,19 +150,16 @@ export const MiPerfil = () => {
             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
               Nombre completo
             </label>
-            <div className="flex items-center gap-3 bg-white rounded-full pl-4 pr-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
-              <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <input
-                id="nombre"
-                name="nombre"
-                type="text"
-                value={profileForm.nombre}
-                onChange={handleProfileChange}
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
-                placeholder="Tu nombre"
-                required
-              />
-            </div>
+            <PillInput
+              icon={<img src={UserIcon} alt="User" className="w-4 h-4" />}
+              id="nombre"
+              name="nombre"
+              type="text"
+              value={profileForm.nombre}
+              onChange={handleProfileChange}
+              placeholder="Tu nombre"
+              required
+            />
           </div>
 
           {/* Teléfono */}
@@ -165,18 +167,15 @@ export const MiPerfil = () => {
             <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
               Teléfono
             </label>
-            <div className="flex items-center gap-3 bg-white rounded-full pl-4 pr-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
-              <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              <input
-                id="telefono"
-                name="telefono"
-                type="tel"
-                value={profileForm.telefono}
-                onChange={handleProfileChange}
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder:text-gray-400"
-                placeholder="Ej: +54 9 11 1234-5678"
-              />
-            </div>
+            <PillInput
+              icon={<img src={PhoneIcon} alt="Phone" className="w-4 h-4" />}
+              id="telefono"
+              name="telefono"
+              type="tel"
+              value={profileForm.telefono}
+              onChange={handleProfileChange}
+              placeholder="Ej: +54 9 11 1234-5678"
+            />
           </div>
 
           {profileError && (
@@ -203,7 +202,7 @@ export const MiPerfil = () => {
       </div>
 
       {/* Cambiar contraseña */}
-      <div className="bg-white rounded-2xl shadow-sm border border-[#DEDEDE] p-6">
+      <div className="bg-white rounded-2xl p-6" style={{ boxShadow: '0px 1px 34px 0px rgba(16, 24, 40, 0.08)' }}>
         <h2 className="text-base font-semibold text-gray-900 mb-1">Cambiar contraseña</h2>
         <p className="text-xs text-gray-500 mb-5">Dejá los campos en blanco si no querés cambiar tu contraseña</p>
 
@@ -214,8 +213,10 @@ export const MiPerfil = () => {
             <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Contraseña actual
             </label>
-            <div className="flex items-center gap-3 bg-white rounded-full pl-4 pr-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
-              <Lock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <div className="flex items-center gap-3 bg-white rounded-full pl-[6px] pr-4 py-[6px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#F6F6F6] flex-shrink-0">
+                <img src={LockIcon} alt="Lock" className="w-4 h-4" />
+              </div>
               <input
                 id="currentPassword"
                 name="currentPassword"
@@ -228,9 +229,10 @@ export const MiPerfil = () => {
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
-                className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                className="flex items-center justify-center w-8 lg:w-10 h-8 lg:h-10 text-gray-600 hover:text-gray-800 flex-shrink-0 transition-colors focus:outline-none"
+                aria-label={showCurrent ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showCurrent ? <EyeOff className="w-4 lg:w-5 h-4 lg:h-5" /> : <Eye className="w-4 lg:w-5 h-4 lg:h-5" />}
               </button>
             </div>
           </div>
@@ -240,8 +242,10 @@ export const MiPerfil = () => {
             <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Nueva contraseña
             </label>
-            <div className="flex items-center gap-3 bg-white rounded-full pl-4 pr-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
-              <Lock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <div className="flex items-center gap-3 bg-white rounded-full pl-[6px] pr-4 py-[6px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#F6F6F6] flex-shrink-0">
+                <img src={LockIcon} alt="Lock" className="w-4 h-4" />
+              </div>
               <input
                 id="newPassword"
                 name="newPassword"
@@ -254,9 +258,10 @@ export const MiPerfil = () => {
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
-                className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                className="flex items-center justify-center w-8 lg:w-10 h-8 lg:h-10 text-gray-600 hover:text-gray-800 flex-shrink-0 transition-colors focus:outline-none"
+                aria-label={showNew ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showNew ? <EyeOff className="w-4 lg:w-5 h-4 lg:h-5" /> : <Eye className="w-4 lg:w-5 h-4 lg:h-5" />}
               </button>
             </div>
           </div>
@@ -266,8 +271,10 @@ export const MiPerfil = () => {
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirmar nueva contraseña
             </label>
-            <div className="flex items-center gap-3 bg-white rounded-full pl-4 pr-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
-              <Lock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <div className="flex items-center gap-3 bg-white rounded-full pl-[6px] pr-4 py-[6px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-transparent focus-within:border-[#DEDEDE]">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#F6F6F6] flex-shrink-0">
+                <img src={LockIcon} alt="Lock" className="w-4 h-4" />
+              </div>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -280,9 +287,10 @@ export const MiPerfil = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                className="flex items-center justify-center w-8 lg:w-10 h-8 lg:h-10 text-gray-600 hover:text-gray-800 flex-shrink-0 transition-colors focus:outline-none"
+                aria-label={showConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showConfirm ? <EyeOff className="w-4 lg:w-5 h-4 lg:h-5" /> : <Eye className="w-4 lg:w-5 h-4 lg:h-5" />}
               </button>
             </div>
           </div>

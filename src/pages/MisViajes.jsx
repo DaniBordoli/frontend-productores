@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Truck } from 'lucide-react';
 import arrowRightSvg from '../assets/arrow-right.svg';
+import TruckIcon from '../assets/Truck.svg';
 import tripService from '../services/trip.service';
 import { StatusBadge } from '../components/StatusBadge';
 import Pagination from '../components/Pagination';
@@ -33,6 +33,7 @@ const TABLE_COLUMNS = [
   { key: 'id', label: 'ID Viaje' },
   { key: 'origen', label: 'Origen' },
   { key: 'destino', label: 'Destino' },
+  { key: 'tipoCarga', label: 'Tipo de carga' },
   { key: 'camiones', label: 'N° Camiones' },
   { key: 'fecha', label: 'Fecha', sortable: true },
   { key: 'estado', label: 'Estado', sortable: true },
@@ -117,8 +118,8 @@ export const MisViajes = () => {
   return (
     <div className="space-y-6">
       <div className="mb-2">
-        <h1 className="text-2xl font-semibold text-gray-900">Mis Viajes</h1>
-        <p className="text-gray-600 mt-1">Visualiza y gestiona tus solicitudes de viaje.</p>
+        <h1 className="text-2xl font-semibold text-gray-900">Viajes</h1>
+        <p className="text-gray-600 mt-1">Gestiona la información de los viajes disponibles.</p>
       </div>
 
       <ListPageToolbar
@@ -138,7 +139,11 @@ export const MisViajes = () => {
         <DataTable
           columns={TABLE_COLUMNS}
           data={paginatedTrips}
-          emptyIcon={<Truck className="w-12 h-12 text-gray-300" />}
+          emptyIcon={
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: '#F6F6F6' }}>
+              <img src={TruckIcon} alt="" className="w-6 h-6" />
+            </div>
+          }
           emptyTitle="No se encontraron viajes"
           emptySubtitle={
             searchTerm || filters.estado
@@ -163,6 +168,9 @@ export const MisViajes = () => {
                 {trip.destino?.ciudad
                   ? `${trip.destino.ciudad}, ${trip.destino.provincia}`
                   : '-'}
+              </td>
+              <td className="px-6 py-4 text-sm text-[#363636]">
+                {trip.tipoCarga || '-'}
               </td>
               <td className="px-6 py-4 text-sm text-[#363636]">
                 {trip.camionesSolicitados ?? '-'}
@@ -205,7 +213,9 @@ export const MisViajes = () => {
       <div className="md:hidden">
         {mobileTrips.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center border border-[#DEDEDE] rounded-2xl bg-white">
-            <Truck className="w-12 h-12 text-gray-300 mb-3" />
+            <div className="w-12 h-12 rounded-lg bg-[#F6F6F6] flex items-center justify-center mb-3">
+              <img src={TruckIcon} alt="" className="w-6 h-6" />
+            </div>
             <p className="text-base font-semibold text-gray-700">No se encontraron viajes</p>
             <p className="text-sm text-gray-400 mt-1">
               {searchTerm || filters.estado
@@ -221,8 +231,8 @@ export const MisViajes = () => {
                 className="flex items-center gap-3 px-4 py-4 bg-white cursor-pointer active:bg-gray-50"
                 onClick={() => navigate(`/viajes/${trip._id}`)}
               >
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <Truck className="w-5 h-5 text-gray-400" />
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#F6F6F6' }}>
+                  <img src={TruckIcon} alt="" className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -231,7 +241,7 @@ export const MisViajes = () => {
                     </span>
                     <StatusBadge status={trip.estado} />
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs mt-0.5" style={{ color: '#7A7A7A' }}>
                     {trip.numeroViaje ? `#${trip.numeroViaje}` : '-'}
                     {' • '}
                     {trip.fechaProgramada

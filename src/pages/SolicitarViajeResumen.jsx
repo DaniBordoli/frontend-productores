@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { X, ArrowLeft, ChevronDown, Truck, AlertTriangle, PlusCircle, Loader2 } from 'lucide-react';
+import { X, ArrowLeft, ChevronDown, Loader2, AlertTriangle } from 'lucide-react';
 import logo from '../assets/rutaycampoLogo.svg';
+import TruckIcon from '../assets/Truck.svg';
+import AlertRectangle from '../assets/AlertRectangle.svg';
+import ElipseTrip from '../assets/ElipseTrip.svg';
 import tripService from '../services/trip.service';
 import { Button, PillInput } from '../components/ui';
+import { MobileNavbar } from '../components/MobileNavbar';
+import PlusCircleIcon from '../assets/PlusCircle.svg';
 
 const formatNum = (n) => n.toLocaleString('es-AR', { maximumFractionDigits: 0 });
 
@@ -23,7 +28,7 @@ function SectionHeader({ title, actionLabel, onAction, badge }) {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         {badge && (
           <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
             {badge}
@@ -54,7 +59,7 @@ function NegociarModal({ tarifaActual, onClose, onConfirm }) {
         style={{ width: '565px', border: '1px solid #DDE1E6' }}
       >
         <div className="flex items-start justify-between px-8 pt-8 pb-0">
-          <h2 className="text-xl font-bold text-gray-900">Proponer nueva tarifa</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Proponer nueva tarifa</h2>
           <button
             type="button"
             onClick={onClose}
@@ -65,22 +70,22 @@ function NegociarModal({ tarifaActual, onClose, onConfirm }) {
           </button>
         </div>
 
-        <p className="px-8 mt-3 text-sm text-gray-500 leading-relaxed">
+        <p className="px-8 mt-3 font-regular text-sm text-gray-500 leading-relaxed">
           Ingresá tu propuesta de tarifa total para el viaje. Luego será evaluada por el equipo de logística y te contactarán para definir la tarifa final.
         </p>
 
         <div className="mx-8 mt-6 bg-gray-50 rounded-2xl px-5 py-4">
           <p className="text-sm text-gray-500">Tarifa actual</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
+          <p className="text-2xl font-semibold text-gray-900 mt-1">
             ${tarifaActual ? tarifaActual.toLocaleString('es-AR') : '-'} x km x tn
           </p>
         </div>
 
         <div className="mx-8 mt-5">
-          <label className="text-sm font-medium text-gray-800">Tu tarifa propuesta ($ x km x tn)*</label>
+          <label className="text-sm font-medium text-gray-800">Tu tarifa propuesta*</label>
           <div className="mt-2">
             <PillInput
-              icon={<PlusCircle className="w-4 h-4" />}
+              icon={<img src={PlusCircleIcon} alt="" className="w-4 h-4" />}
               type="number"
               min={0}
               placeholder={tarifaActual ? String(tarifaActual) : '1000'}
@@ -113,26 +118,31 @@ function RouteDisplay({ formData }) {
   return (
     <div className="flex items-start gap-3 mt-3">
       <div className="flex flex-col items-center">
-        <div className="w-5 h-5 rounded-full bg-green-50 border-2 border-[#45845C] flex items-center justify-center">
-          <div className="w-2 h-2 rounded-full bg-[#45845C]" />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center md:w-10 md:h-10" style={{ background: '#F1F8F3', width: 55, height: 55 }}>
+          <img src={ElipseTrip} alt="" className="w-[18px] h-[18px]" />
         </div>
         <div className="w-px border-l-2 border-dashed border-gray-300 h-10 my-1" />
-        <div className="w-5 h-5 rounded-full bg-green-50 border-2 border-[#45845C] flex items-center justify-center">
-          <div className="w-2 h-2 rounded-full bg-[#45845C]" />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center md:w-10 md:h-10" style={{ background: '#F1F8F3', width: 55, height: 55 }}>
+          <img src={ElipseTrip} alt="" className="w-[18px] h-[18px]" />
         </div>
       </div>
-      <div className="flex flex-col gap-5 flex-1">
-        <div>
-          <p className="text-xs text-gray-400">Origen</p>
-          <p className="text-sm font-semibold text-gray-900">
-            {formData.origen.ciudad}, {formData.origen.provincia}
-          </p>
+      <div className="flex flex-col flex-1">
+        <div className="flex items-center" style={{ height: 55 }}>
+          <div>
+            <p className="text-xs" style={{ color: '#7A7A7A' }}>Origen</p>
+            <p className="text-sm font-medium text-gray-900">
+              {formData.origen.ciudad}, {formData.origen.provincia}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs text-gray-400">Destino</p>
-          <p className="text-sm font-semibold text-gray-900">
-            {formData.destino.ciudad}, {formData.destino.provincia}
-          </p>
+        <div className="h-10 my-1" />
+        <div className="flex items-center" style={{ height: 55 }}>
+          <div>
+            <p className="text-xs" style={{ color: '#7A7A7A' }}>Destino</p>
+            <p className="text-sm font-medium text-gray-900">
+              {formData.destino.ciudad}, {formData.destino.provincia}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -379,6 +389,9 @@ export const SolicitarViajeResumen = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col lg:h-screen">
+      {/* Mobile Navbar */}
+      <MobileNavbar />
+      
       {/* Mobile header */}
       <div className="lg:hidden flex-shrink-0">
         <div className="flex items-center justify-between px-4 py-3">
@@ -463,11 +476,18 @@ export const SolicitarViajeResumen = () => {
                 onAction={() => editarStep(1)}
               />
               <RouteDisplay formData={formData} />
-              {tipoDestinoLabel && (
+              {(tipoDestinoLabel || distanciaKm) && (
                 <div className="flex gap-2 mt-4">
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                    {tipoDestinoLabel}
-                  </span>
+                  {tipoDestinoLabel && (
+                    <span className="text-xs bg-gray-100 px-3 py-1 rounded-full" style={{ color: '#888888' }}>
+                      {tipoDestinoLabel}
+                    </span>
+                  )}
+                  {distanciaKm && (
+                    <span className="text-xs bg-gray-100 px-3 py-1 rounded-full" style={{ color: '#888888' }}>
+                      {Math.round(distanciaKm)} km
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -479,7 +499,7 @@ export const SolicitarViajeResumen = () => {
                 actionLabel="Editar"
                 onAction={() => editarStep(2)}
               />
-              <p className="text-sm text-gray-700 mt-2">
+              <p className="text-sm mt-2" style={{ color: '#7A7A7A' }}>
                 {fechaFormateada} - {formData.hora || '--:--'}
               </p>
             </div>
@@ -493,12 +513,12 @@ export const SolicitarViajeResumen = () => {
               />
               <ul className="mt-2 space-y-1">
                 {nComunes > 0 && (
-                  <li className="text-sm text-gray-700">• {nComunes} camiones comunes</li>
+                  <li className="text-sm" style={{ color: '#7A7A7A' }}>• {nComunes} camiones comunes</li>
                 )}
                 {nEscalables > 0 && (
-                  <li className="text-sm text-gray-700">• {nEscalables} camiones escalables</li>
+                  <li className="text-sm" style={{ color: '#7A7A7A' }}>• {nEscalables} camiones escalables</li>
                 )}
-                <li className="text-sm text-gray-700">• Traslado: {granoLabel}</li>
+                <li className="text-sm" style={{ color: '#7A7A7A' }}>• Traslado: {granoLabel}</li>
               </ul>
               <div className="mt-3 px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-400">
                 {formData.notas || 'Comentarios de las notas adicionales'}
@@ -509,7 +529,7 @@ export const SolicitarViajeResumen = () => {
             <div className="border-t border-gray-100 mt-5 pt-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-lg font-bold text-gray-900">Valor total</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Valor total</h3>
                   {tarifaPropuesta && (
                     <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border" style={{ background: '#FEFCE8', color: '#A16207', borderColor: '#FDE68A' }}>
                       Tarifa a negociar
@@ -551,37 +571,33 @@ export const SolicitarViajeResumen = () => {
                         className="w-full flex items-center gap-3 py-3 border-b border-gray-100 text-left"
                         onClick={() => setExpandComun((v) => !v)}
                       >
-                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <Truck className="w-4 h-4 text-gray-500" />
+                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <img src={TruckIcon} alt="" className="w-4 h-4" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">Camiones comunes</p>
-                          <p className="text-xs text-gray-400">{nComunes} unidades · 30 tn c/u</p>
+                          <p className="text-xs text-gray-400">{nComunes} unidades</p>
                         </div>
-                        <span className="text-sm font-semibold text-gray-900 mr-1">
-                          {formatPrice(tarifaPropuesta
-                            ? TN_COMUN * distanciaKm * tarifaPropuesta * nComunes
-                            : totalComunes)}
-                        </span>
                         <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${expandComun ? 'rotate-180' : ''}`} />
                       </button>
                       {expandComun && (
                         <div className="mb-3 rounded-2xl px-5 py-4 text-sm" style={{ background: '#F6F6F6', color: '#7A7A7A' }}>
                           <div className="flex justify-between py-1.5">
-                            <span>Tarifa x km x tn</span><span>${formatNum(tarifaEfectiva)}</span>
+                            <span>Tarifa x km</span><span>{formatNum(tarifaEfectiva)}</span>
                           </div>
                           <div className="flex justify-between py-1.5">
-                            <span>Distancia</span><span>{formatNum(distanciaKm)} km</span>
+                            <span>Distancia</span><span>{formatNum(distanciaKm)}</span>
                           </div>
                           <div className="flex justify-between py-1.5">
-                            <span>Toneladas por camión</span><span>30 tn</span>
-                          </div>
-                          <div className="flex justify-between py-1.5">
-                            <span>Cantidad</span><span>{nComunes} camiones</span>
+                            <span>Toneladas</span><span>30</span>
                           </div>
                           <div className="border-t my-2" style={{ borderColor: '#E0E0E0' }} />
-                          <div className="flex justify-between py-1.5 font-medium">
-                            <span>Subtotal comunes</span>
+                          <div className="flex justify-between py-1.5">
+                            <span>Valor del camión</span>
+                            <span>{formatNum(TN_COMUN * distanciaKm * tarifaEfectiva)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span>Valor {nComunes} camiones</span>
                             <span>{formatNum(tarifaPropuesta
                               ? TN_COMUN * distanciaKm * tarifaPropuesta * nComunes
                               : totalComunes)}</span>
@@ -598,37 +614,33 @@ export const SolicitarViajeResumen = () => {
                         className="w-full flex items-center gap-3 py-3 border-b border-gray-100 text-left"
                         onClick={() => setExpandEscalable((v) => !v)}
                       >
-                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                          <Truck className="w-4 h-4 text-gray-500" />
+                        <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                          <img src={TruckIcon} alt="" className="w-4 h-4" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-900">Camiones escalables</p>
-                          <p className="text-xs text-gray-400">{nEscalables} unidades · 37,5 tn c/u</p>
+                          <p className="text-xs text-gray-400">{nEscalables} unidades</p>
                         </div>
-                        <span className="text-sm font-semibold text-gray-900 mr-1">
-                          {formatPrice(tarifaPropuesta
-                            ? TN_ESCALABLE * distanciaKm * tarifaPropuesta * nEscalables
-                            : totalEscalables)}
-                        </span>
                         <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${expandEscalable ? 'rotate-180' : ''}`} />
                       </button>
                       {expandEscalable && (
                         <div className="mb-3 rounded-2xl px-5 py-4 text-sm" style={{ background: '#F6F6F6', color: '#7A7A7A' }}>
                           <div className="flex justify-between py-1.5">
-                            <span>Tarifa x km x tn</span><span>${formatNum(tarifaEfectiva)}</span>
+                            <span>Tarifa x km</span><span>{formatNum(tarifaEfectiva)}</span>
                           </div>
                           <div className="flex justify-between py-1.5">
-                            <span>Distancia</span><span>{formatNum(distanciaKm)} km</span>
+                            <span>Distancia</span><span>{formatNum(distanciaKm)}</span>
                           </div>
                           <div className="flex justify-between py-1.5">
-                            <span>Toneladas por camión</span><span>37,5 tn</span>
-                          </div>
-                          <div className="flex justify-between py-1.5">
-                            <span>Cantidad</span><span>{nEscalables} camiones</span>
+                            <span>Toneladas</span><span>37,5</span>
                           </div>
                           <div className="border-t my-2" style={{ borderColor: '#E0E0E0' }} />
-                          <div className="flex justify-between py-1.5 font-medium">
-                            <span>Subtotal escalables</span>
+                          <div className="flex justify-between py-1.5">
+                            <span>Valor del camión</span>
+                            <span>{formatNum(TN_ESCALABLE * distanciaKm * tarifaEfectiva)}</span>
+                          </div>
+                          <div className="flex justify-between py-1.5">
+                            <span>Valor {nEscalables} camiones</span>
                             <span>{formatNum(tarifaPropuesta
                               ? TN_ESCALABLE * distanciaKm * tarifaPropuesta * nEscalables
                               : totalEscalables)}</span>
@@ -639,18 +651,18 @@ export const SolicitarViajeResumen = () => {
                   )}
 
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-base font-bold text-gray-900">Total</span>
-                    <span className="text-base font-bold text-gray-900">
+                    <span className="text-base font-semibold text-gray-900">Total</span>
+                    <span className="text-base font-semibold text-gray-900">
                       {formatPrice(totalEfectivo)}
                     </span>
                   </div>
                 </>
               )}
 
-              <div className="flex items-start gap-2 bg-yellow-50 text-yellow-700 text-xs px-4 py-3 rounded-xl">
-                <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 text-xs px-4 py-3 rounded-xl" style={{ background: '#FFFAE5', color: '#BFA300' }}>
+                <img src={AlertRectangle} alt="" className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>
-                  No se realizará ningún cobro ahora. Nos contactaremos para avanzar con el pago.
+                 Al continuar solo aceptás la tarifa. No se realizará ningún cobro ahora. Nos contactaremos para avanzar con el pago.
                 </span>
               </div>
             </div>
